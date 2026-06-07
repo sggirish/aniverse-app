@@ -3,11 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { AdUnit } from "@/components/ads/AdUnit";
+import type { RoastResult, TasteDNA } from "@/lib/claude";
 
 declare global { interface Window { plausible?: (event: string, opts?: object) => void; } }
 
-interface RoastResult {
-  roast_text: string;
+interface ApiResponse {
+  roast_result: RoastResult;
   username: string;
   platform: "mal" | "anilist";
   stats: {
@@ -27,6 +28,14 @@ const LOADING_MESSAGES = [
   "Consulting the anime council…",
   "Writing your roast…",
 ];
+
+const DNA_LABELS: Record<keyof TasteDNA, { label: string; lowLabel: string; highLabel: string; color: string }> = {
+  mainstream:      { label: "Mainstream",    lowLabel: "Hidden Gem Hunter",   highLabel: "Normie",         color: "#8B5CF6" },
+  patience:        { label: "Patience",      lowLabel: "Can't Commit",        highLabel: "Arc Enjoyer",    color: "#2563EB" },
+  darkness:        { label: "Darkness",      lowLabel: "Wholesome Only",      highLabel: "Edge Lord",      color: "#111827" },
+  emotional_depth: { label: "Emotional",     lowLabel: "Stone Cold",          highLabel: "Cries Easily",   color: "#DC2626" },
+  completion_rate: { label: "Completion",    lowLabel: "Serial Dropper",      highLabel: "True Completionist", color: "#16A34A" },
+};
 
 function TypewriterText({ text, onDone }: { text: string; onDone?: () => void }) {
   const [displayed, setDisplayed] = useState("");
@@ -54,12 +63,34 @@ function TypewriterText({ text, onDone }: { text: string; onDone?: () => void })
   return <span className={done ? "" : "typewriter-cursor"}>{displayed}</span>;
 }
 
+function DNABar({ label, value, lowLabel, highLabel, color }: { label: string; value: number; lowLabel: string; highLabel: string; color: string }) {
+  const pct = Math.min(Math.max(value, 1), 10) * 10;
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-bold text-[#374151]">{label}</span>
+        <span className="text-[#9CA3AF]">{value}/10</span>
+      </div>
+      <div className="h-2 bg-[#F3F4F6] rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{ width: `${pct}%`, background: color }}
+        />
+      </div>
+      <div className="flex justify-between text-[10px] text-[#9CA3AF]">
+        <span>{lowLabel}</span>
+        <span>{highLabel}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function RoastPage() {
   const [platform, setPlatform] = useState<"mal" | "anilist">("mal");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState(0);
-  const [result, setResult] = useState<RoastResult | null>(null);
+  const [result, setResult] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [textDone, setTextDone] = useState(false);
 
@@ -95,6 +126,7 @@ export default function RoastPage() {
     }
   };
 
+  const r = result?.roast_result;
   const statItems = result?.stats ? [
     { label: "Completed", value: result.stats.completed, icon: "✅" },
     { label: "Episodes", value: result.stats.episodes_watched?.toLocaleString(), icon: "📺" },
@@ -124,7 +156,7 @@ export default function RoastPage() {
             Get Destroyed.<br /><span className="text-[#DC2626]">Lovingly.</span>
           </h1>
           <p className="text-[#6B7280] text-base leading-relaxed max-w-md">
-            Claude reads your entire anime list and writes a brutally honest, weirdly personal roast. Works with MAL and AniList.
+            Claude reads your anime list and gives you a brutally honest personality breakdown — your taste DNA, your sins, and how to fix yourself.
           </p>
         </div>
 
@@ -198,8 +230,8 @@ export default function RoastPage() {
         )}
 
         {/* Result */}
-        {result && (
-          <div className="space-y-5 result-card">
+        {result && r && (
+          <div className="space-y-4 result-card">
 
             {/* Stats grid */}
             {statItems.length > 0 && (
@@ -216,8 +248,43 @@ export default function RoastPage() {
               </div>
             )}
 
+            {/* Personality type header */}
+            {r.personality_type && (
+              <div className="bg-gradient-to-r from-[#111827] to-[#1F2937] text-white rounded-2xl p-6 animate-bounce-in">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-1">Your Anime Personality</p>
+                <h2 className="text-2xl sm:text-3xl font-black mb-1">{r.personality_type}</h2>
+                {r.roast_tier && (
+                  <span className="inline-block text-xs font-bold bg-[#DC2626] text-white px-3 py-1 rounded-full mt-1">
+                    {r.roast_tier}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Taste DNA */}
+            {r.taste_dna && (
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 animate-fade-in-up stagger-1">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#6B7280] mb-4">Taste DNA</p>
+                <div className="space-y-4">
+                  {(Object.entries(r.taste_dna) as [keyof TasteDNA, number][]).map(([key, val]) => {
+                    const cfg = DNA_LABELS[key];
+                    return (
+                      <DNABar
+                        key={key}
+                        label={cfg.label}
+                        value={val}
+                        lowLabel={cfg.lowLabel}
+                        highLabel={cfg.highLabel}
+                        color={cfg.color}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Roast card */}
-            <div className="bg-[#FFF8F5] border border-[#FCA5A5] rounded-2xl p-7 space-y-4">
+            <div className="bg-[#FFF8F5] border border-[#FCA5A5] rounded-2xl p-7 space-y-4 animate-fade-in-up stagger-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">🔥</span>
@@ -231,26 +298,57 @@ export default function RoastPage() {
               <div className="border-t border-[#FCA5A5]" />
               <p className="text-base leading-[1.9] text-[#1F1F1F]"
                 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontStyle: "italic" }}>
-                <TypewriterText text={result.roast_text} onDone={() => setTextDone(true)} />
+                <TypewriterText text={r.roast_text} onDone={() => setTextDone(true)} />
               </p>
             </div>
 
-            {/* Actions — appear after typewriter finishes */}
+            {/* Taste sins */}
+            {r.taste_sins && r.taste_sins.length > 0 && textDone && (
+              <div className="bg-[#FEF2F2] border border-red-200 rounded-2xl p-5 animate-fade-in-up stagger-3">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#DC2626] mb-3">Your Taste Sins</p>
+                <div className="space-y-2">
+                  {r.taste_sins.map((sin, i) => (
+                    <div key={i} className="flex items-start gap-2.5 text-sm text-[#374151]">
+                      <span className="text-red-400 font-black shrink-0 mt-0.5">#{i + 1}</span>
+                      <span>{sin}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Redemption arc */}
+            {r.redemption_arc && r.redemption_arc.length > 0 && textDone && (
+              <div className="bg-[#F0FDF4] border border-green-200 rounded-2xl p-5 animate-fade-in-up stagger-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#16A34A] mb-3">Your Redemption Arc</p>
+                <p className="text-xs text-[#6B7280] mb-3">Watch these to fix your taste:</p>
+                <div className="flex flex-wrap gap-2">
+                  {r.redemption_arc.map((anime, i) => (
+                    <button
+                      key={i}
+                      onClick={() => window.open(`/watch/${anime.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`, "_blank")}
+                      className="text-sm font-bold px-4 py-2 bg-white border border-green-200 rounded-xl text-[#16A34A] hover:bg-green-50 transition-colors">
+                      {anime} →
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
             {textDone && (
               <div className="space-y-4 animate-fade-in-up">
-                {/* Share section */}
                 <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
                   <p className="text-sm font-black mb-1">Share your roast</p>
-                  <p className="text-xs text-[#9CA3AF] mb-4">Challenge your friends — send them this roast or dare them to get their own.</p>
+                  <p className="text-xs text-[#9CA3AF] mb-4">Challenge your friends — dare them to get their own.</p>
                   <ShareButtons
                     url={shareUrl}
-                    text={`my anime taste got absolutely destroyed by AI. get yours roasted too`}
-                    title={`${result.username}'s Anime Roast`}
+                    text={`my anime taste got absolutely destroyed by AI — I'm "${r.personality_type}". get yours roasted too`}
+                    title={`${result.username}&apos;s Anime Roast`}
                     platform={platform}
                   />
                 </div>
 
-                {/* Challenge CTA */}
                 <div className="p-4 bg-[#111827] text-white rounded-xl flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm font-bold">Dare a friend</p>
@@ -265,7 +363,6 @@ export default function RoastPage() {
 
                 <AdUnit slot="roast-result" format="auto" />
 
-                {/* Crunchyroll */}
                 <div className="p-4 bg-white border border-[#E5E7EB] rounded-xl flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">🍊</span>

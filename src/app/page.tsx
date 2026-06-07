@@ -24,21 +24,21 @@ export default async function HomePage() {
         </h1>
 
         <p className="text-[#6B7280] text-lg max-w-xl mb-12 leading-relaxed animate-fade-in-up stagger-2">
-          Three free tools that understand anime better than your friends. No login, no BS — just instant results.
+          Four free AI tools that understand anime better than your friends. No login, no BS — just instant results.
         </p>
 
         {/* Tool cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-fade-in-up stagger-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up stagger-3">
 
           {/* Roast */}
           <div className="group bg-gradient-to-br from-[#FFF5F5] to-[#FEE2E2] border border-red-200 rounded-2xl p-6 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
             <div className="flex items-center justify-between">
               <span className="text-3xl">🔥</span>
-              <span className="text-xs font-bold text-[#DC2626] bg-red-100 px-2 py-0.5 rounded-full">MAL Required</span>
+              <span className="text-xs font-bold text-[#DC2626] bg-red-100 px-2 py-0.5 rounded-full">MAL · AniList</span>
             </div>
             <div>
               <p className="font-black text-lg text-[#DC2626] mb-1">Anime Roast</p>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Paste your MyAnimeList username. Claude reads your entire watch history and writes you a brutally honest, weirdly personal roast.</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed">Claude reads your anime list and gives you a full personality breakdown — your Taste DNA, your biggest sins, and your redemption arc.</p>
             </div>
             <Link href="/roast"
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#DC2626] text-white rounded-xl text-center hover:bg-[#b91c1c] transition-colors group-hover:shadow-md">
@@ -54,7 +54,7 @@ export default async function HomePage() {
             </div>
             <div>
               <p className="font-black text-lg text-[#16A34A] mb-1">Should I Watch?</p>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Search any anime. Get an instant WATCH / SKIP / WAIT verdict with reasons, who it&apos;s for, and a test episode.</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed">Search any anime. Get a WATCH / SKIP / WAIT verdict with vibe tags, binge score, and similar anime — no spoilers.</p>
             </div>
             <Link href="/watch"
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#16A34A] text-white rounded-xl text-center hover:bg-[#15803d] transition-colors group-hover:shadow-md">
@@ -66,15 +66,31 @@ export default async function HomePage() {
           <div className="group bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 rounded-2xl p-6 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
             <div className="flex items-center justify-between">
               <span className="text-3xl">🔮</span>
-              <span className="text-xs font-bold text-[#2563EB] bg-blue-100 px-2 py-0.5 rounded-full">5 Questions</span>
+              <span className="text-xs font-bold text-[#2563EB] bg-blue-100 px-2 py-0.5 rounded-full">8 Questions</span>
             </div>
             <div>
               <p className="font-black text-lg text-[#2563EB] mb-1">Character Match</p>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Answer 5 psychological questions. Claude matches you to an anime character that mirrors how you actually think and feel.</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed">8 psychological questions. Claude gives you a primary match, a secondary match, your archetype, and your shadow self.</p>
             </div>
             <Link href="/character"
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#2563EB] text-white rounded-xl text-center hover:bg-[#1d4ed8] transition-colors group-hover:shadow-md">
               Find my character →
+            </Link>
+          </div>
+
+          {/* Mood Finder */}
+          <div className="group bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] border border-purple-200 rounded-2xl p-6 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+            <div className="flex items-center justify-between">
+              <span className="text-3xl">🎭</span>
+              <span className="text-xs font-bold text-[#7C3AED] bg-purple-100 px-2 py-0.5 rounded-full">No account</span>
+            </div>
+            <div>
+              <p className="font-black text-lg text-[#7C3AED] mb-1">Mood Finder</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed">Pick up to 3 moods. Claude picks 3 perfect anime for exactly how you feel right now. The fastest way to decide what to watch tonight.</p>
+            </div>
+            <Link href="/mood"
+              className="mt-auto text-sm font-bold px-4 py-3 bg-[#7C3AED] text-white rounded-xl text-center hover:bg-[#6D28D9] transition-colors group-hover:shadow-md">
+              Find tonight&apos;s anime →
             </Link>
           </div>
         </div>

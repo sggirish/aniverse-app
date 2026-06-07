@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getVerdict, getTrendingVerdicts, getAllVerdictSlugs } from "@/lib/db";
+import { getVerdict, getTrendingVerdicts, getAllVerdictSlugs, type VerdictMetadata } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -27,13 +27,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const verdict = await getVerdict(slug);
   if (!verdict) return { title: "Verdict Not Found" };
 
+  const meta = verdict.metadata as VerdictMetadata | undefined;
   const verdictLabel = verdict.verdict === "WATCH" ? "✅ WATCH" : verdict.verdict === "SKIP" ? "❌ SKIP" : "⏳ WAIT";
+  const description = meta?.hook ?? verdict.for_who ?? verdict.reasoning.slice(0, 140);
+
   return {
     title: `Is ${verdict.anime_title} Worth Watching? ${verdictLabel} — AniVerse`,
-    description: `${verdict.for_who} ${verdict.reasoning.slice(0, 140)}`,
+    description,
     openGraph: {
       title: `${verdict.anime_title}: ${verdictLabel}`,
-      description: verdict.for_who,
+      description,
       images: verdict.image_url
         ? [{ url: verdict.image_url, width: 225, height: 320 }, { url: `/api/og/verdict?slug=${slug}` }]
         : [`/api/og/verdict?slug=${slug}`],
@@ -50,33 +53,40 @@ export default async function VerdictPage({ params }: Props) {
   const related = await getTrendingVerdicts(4);
   const others = related.filter((r) => r.anime_slug !== slug).slice(0, 3);
 
+  const meta = verdict.metadata as VerdictMetadata | undefined;
+
   const cfg = {
     WATCH: {
       label: "WATCH",
       bg: "bg-green-50", border: "border-green-200", text: "text-green-700",
       badge: "bg-green-500", badgeText: "text-white",
       heroBg: "from-green-50 to-[#FAFAF9]",
-      icon: "✅", iconBig: "🟢",
+      icon: "✅",
     },
     SKIP: {
       label: "SKIP",
       bg: "bg-red-50", border: "border-red-200", text: "text-red-700",
       badge: "bg-red-500", badgeText: "text-white",
       heroBg: "from-red-50 to-[#FAFAF9]",
-      icon: "❌", iconBig: "🔴",
+      icon: "❌",
     },
     WAIT: {
       label: "WAIT",
       bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-700",
       badge: "bg-amber-500", badgeText: "text-white",
       heroBg: "from-amber-50 to-[#FAFAF9]",
-      icon: "⏳", iconBig: "🟡",
+      icon: "⏳",
     },
   }[verdict.verdict];
 
   const reasons = verdict.reasoning.split("\n").filter(Boolean);
   const crunchUrl = crunchyrollLink();
   const nordUrl = nordvpnLink();
+
+  const bingeScore = meta?.binge_score;
+  const vibeTags = meta?.vibe_tags ?? [];
+  const hook = meta?.hook;
+  const similarAnime = meta?.similar_anime ?? [];
 
   return (
     <div className="min-h-screen bg-[#FAFAF9]">
@@ -99,7 +109,7 @@ export default async function VerdictPage({ params }: Props) {
           </div>
 
           {/* Poster + title row */}
-          <div className="flex gap-5 items-start mb-6 animate-fade-in-up">
+          <div className="flex gap-5 items-start mb-5 animate-fade-in-up">
             {verdict.image_url && (
               <div className="shrink-0">
                 <Image
@@ -113,20 +123,53 @@ export default async function VerdictPage({ params }: Props) {
             )}
             <div className="flex-1 min-w-0">
               <p className="text-xs text-[#9CA3AF] mb-1.5 font-medium uppercase tracking-wide">Should you watch?</p>
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-4">{verdict.anime_title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-3">{verdict.anime_title}</h1>
 
               {/* Verdict badge */}
-              <div className={`verdict-badge inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl border ${cfg.bg} ${cfg.border}`}>
+              <div className={`verdict-badge inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl border ${cfg.bg} ${cfg.border} mb-3`}>
                 <span className="text-2xl">{cfg.icon}</span>
                 <span className={`text-2xl sm:text-3xl font-black ${cfg.text}`}>{cfg.label}</span>
               </div>
+
+              {/* Binge score */}
+              {bingeScore != null && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[#6B7280]">Binge score</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div key={i} className={`w-2.5 h-2.5 rounded-sm ${i < bingeScore ? "bg-[#F47521]" : "bg-[#E5E7EB]"}`} />
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-[#374151]">{bingeScore}/10</span>
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Hook */}
+          {hook && (
+            <div className={`rounded-xl border px-4 py-3 ${cfg.bg} ${cfg.border}`}>
+              <p className={`text-sm font-semibold italic ${cfg.text}`}>&ldquo;{hook}&rdquo;</p>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-5">
+
+        {/* Vibe tags */}
+        {vibeTags.length > 0 && (
+          <div className="animate-fade-in-up">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#6B7280] mb-2.5">Vibes</p>
+            <div className="flex flex-wrap gap-2">
+              {vibeTags.map((tag) => (
+                <span key={tag} className="text-xs font-bold px-3 py-1.5 bg-white border border-[#E5E7EB] rounded-full text-[#374151]">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Reasons */}
         <div className={`rounded-2xl border p-6 animate-fade-in-up stagger-1 ${cfg.bg} ${cfg.border}`}>
@@ -170,6 +213,23 @@ export default async function VerdictPage({ params }: Props) {
           </div>
         )}
 
+        {/* Similar anime */}
+        {similarAnime.length > 0 && (
+          <div className="animate-fade-in-up stagger-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#6B7280] mb-3">If you like this, watch</p>
+            <div className="flex flex-wrap gap-2">
+              {similarAnime.map((title) => (
+                <Link
+                  key={title}
+                  href={`/watch/${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                  className="text-sm font-medium px-4 py-2 bg-white border border-[#E5E7EB] rounded-xl hover:border-[#374151] hover:-translate-y-0.5 transition-all">
+                  {title} →
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Crunchyroll CTA — WATCH only */}
         {verdict.verdict === "WATCH" && (
           <div className="flex items-center justify-between gap-4 p-4 bg-[#F47521]/10 border border-[#F47521]/30 rounded-xl animate-fade-in-up stagger-4">
@@ -196,7 +256,6 @@ export default async function VerdictPage({ params }: Props) {
           </a>
         </div>
 
-        {/* Ad */}
         <AdUnit slot="verdict-result" format="auto" className="my-2" />
 
         {/* Share */}

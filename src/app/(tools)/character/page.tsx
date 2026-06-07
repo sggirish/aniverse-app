@@ -62,13 +62,52 @@ const QUESTIONS = [
       { value: "D", label: "Recognition — to be seen for who you really are" },
     ],
   },
+  {
+    id: "q6",
+    text: "When you care about something deeply, you…",
+    emoji: "💎",
+    options: [
+      { value: "A", label: "Pour everything in — you become a little obsessed" },
+      { value: "B", label: "Protect it quietly, without making a big deal" },
+      { value: "C", label: "Want everyone else to care about it too" },
+      { value: "D", label: "Study it until you understand every dimension" },
+    ],
+  },
+  {
+    id: "q7",
+    text: "Your relationship with authority:",
+    emoji: "⚖️",
+    options: [
+      { value: "A", label: "Respect it when earned — ignore it when it isn't" },
+      { value: "B", label: "Work within it better than anyone" },
+      { value: "C", label: "Challenge it — not out of rebellion, but principle" },
+      { value: "D", label: "Observe it carefully from a distance" },
+    ],
+  },
+  {
+    id: "q8",
+    text: "What will you leave behind?",
+    emoji: "🌙",
+    options: [
+      { value: "A", label: "A record — proof that you were here and it mattered" },
+      { value: "B", label: "Better people — those you helped become themselves" },
+      { value: "C", label: "Questions — things that made others think differently" },
+      { value: "D", label: "Nothing visible — you prefer to act without leaving a trace" },
+    ],
+  },
 ];
 
 interface MatchResult {
   id: string;
-  character_name: string;
-  anime_title: string;
+  primary_character: string;
+  primary_anime: string;
+  primary_percent: number;
+  secondary_character: string;
+  secondary_anime: string;
+  secondary_percent: number;
+  archetype: string;
   explanation: string;
+  shadow_note: string;
 }
 
 export default function CharacterPage() {
@@ -99,7 +138,7 @@ export default function CharacterPage() {
     if (step < QUESTIONS.length - 1) {
       setStep(step + 1);
     } else {
-      setStep(QUESTIONS.length); // loading
+      setStep(QUESTIONS.length);
       setError(null);
       try {
         const res = await fetch("/api/character", {
@@ -147,7 +186,7 @@ export default function CharacterPage() {
             <span className="text-[#2563EB]">character are you?</span>
           </h1>
           <p className="text-[#6B7280] text-base leading-relaxed">
-            5 psychological questions. Claude matches you to a character that mirrors how you actually think — not just your favourite anime.
+            8 psychological questions. Claude finds your primary character, your secondary match, and your hidden archetype.
           </p>
         </div>
 
@@ -221,7 +260,7 @@ export default function CharacterPage() {
             </div>
             <div>
               <p className="font-black text-lg text-[#374151]">Analyzing your psyche…</p>
-              <p className="text-sm text-[#9CA3AF] mt-1">Claude is finding your character match</p>
+              <p className="text-sm text-[#9CA3AF] mt-1">Finding your primary and shadow match</p>
             </div>
             <div className="flex justify-center gap-1.5">
               {[0,1,2].map(i => (
@@ -243,28 +282,61 @@ export default function CharacterPage() {
         {isResult && result && (
           <div className="space-y-5">
 
-            {/* Reveal header */}
-            <div className="text-center animate-bounce-in">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB] mb-2">Your match</p>
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight">{result.character_name}</h2>
-              <p className="text-base text-[#6B7280] mt-1 font-semibold">{result.anime_title}</p>
+            {/* Archetype header */}
+            <div className="bg-gradient-to-br from-[#111827] to-[#1E3A5F] text-white rounded-2xl p-6 animate-bounce-in text-center">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#93C5FD] mb-1">Your Archetype</p>
+              <h2 className="text-2xl sm:text-3xl font-black">{result.archetype}</h2>
+            </div>
+
+            {/* Dual match */}
+            <div className="grid grid-cols-2 gap-3 animate-fade-in-up stagger-1">
+              {/* Primary */}
+              <div className="bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE] border-2 border-blue-300 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wide">Primary</span>
+                  <span className="text-lg font-black text-[#2563EB]">{result.primary_percent}%</span>
+                </div>
+                <div className="h-1.5 bg-blue-100 rounded-full mb-3">
+                  <div className="h-full bg-[#2563EB] rounded-full" style={{ width: `${result.primary_percent}%` }} />
+                </div>
+                <p className="font-black text-lg leading-tight text-[#0F0F0F]">{result.primary_character}</p>
+                <p className="text-xs text-[#6B7280] mt-0.5">{result.primary_anime}</p>
+              </div>
+
+              {/* Secondary */}
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wide">Also</span>
+                  <span className="text-lg font-black text-[#6B7280]">{result.secondary_percent}%</span>
+                </div>
+                <div className="h-1.5 bg-[#F3F4F6] rounded-full mb-3">
+                  <div className="h-full bg-[#9CA3AF] rounded-full" style={{ width: `${result.secondary_percent}%` }} />
+                </div>
+                <p className="font-black text-base leading-tight text-[#374151]">{result.secondary_character}</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">{result.secondary_anime}</p>
+              </div>
             </div>
 
             {/* Explanation card */}
-            <div className="bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 rounded-2xl p-7 result-card">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Why you are {result.character_name}</span>
-              </div>
+            <div className="bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE] border border-blue-200 rounded-2xl p-7 animate-fade-in-up stagger-2">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#2563EB] mb-3">Why you are {result.primary_character}</p>
               <div className="border-t border-blue-200 mb-4" />
               <p className="text-base leading-[1.9] text-[#1F1F1F]"
                 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontStyle: "italic" }}>
                 {result.explanation}
               </p>
-              <p className="text-xs text-[#9CA3AF] mt-4">aniverse.app/character/{result.id}</p>
             </div>
 
+            {/* Shadow note */}
+            {result.shadow_note && (
+              <div className="bg-[#111827] text-white rounded-xl p-4 animate-fade-in-up stagger-3">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280] mb-1">Under Pressure</p>
+                <p className="text-sm leading-relaxed text-[#E5E7EB]">{result.shadow_note}</p>
+              </div>
+            )}
+
             {/* Answer recap */}
-            <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 animate-fade-in-up stagger-2">
+            <div className="bg-white border border-[#E5E7EB] rounded-xl p-4 animate-fade-in-up stagger-3">
               <p className="text-xs font-bold text-[#6B7280] uppercase tracking-widest mb-3">Your answers</p>
               <div className="space-y-1.5">
                 {QUESTIONS.map((q) => {
@@ -280,16 +352,15 @@ export default function CharacterPage() {
               </div>
             </div>
 
-            {/* AdSense */}
             <AdUnit slot="character-result" format="auto" />
 
-            {/* Watch the anime CTA */}
-            <div className="bg-[#F0FDF4] border border-green-200 rounded-xl p-4 flex items-center justify-between gap-4 animate-fade-in-up stagger-3">
+            {/* Watch CTA */}
+            <div className="bg-[#F0FDF4] border border-green-200 rounded-xl p-4 flex items-center justify-between gap-4 animate-fade-in-up stagger-4">
               <div>
-                <p className="text-sm font-bold text-[#16A34A]">Watch {result.anime_title}</p>
+                <p className="text-sm font-bold text-[#16A34A]">Watch {result.primary_anime}</p>
                 <p className="text-xs text-[#6B7280] mt-0.5">See where your character comes from.</p>
               </div>
-              <a href={`/watch/${result.anime_title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+              <a href={`/watch/${result.primary_anime.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
                 className="text-xs font-bold px-3 py-2 bg-[#16A34A] text-white rounded-xl hover:bg-[#15803d] shrink-0 transition-colors">
                 Get verdict →
               </a>
@@ -300,12 +371,11 @@ export default function CharacterPage() {
               <p className="text-xs text-[#6B7280] font-bold mb-3 uppercase tracking-wide">Share your result</p>
               <ShareButtons
                 url={`/character/${result.id}`}
-                text={`I got ${result.character_name} from ${result.anime_title} on AniVerse — which character are you?`}
-                title={`I am ${result.character_name}`}
+                text={`I'm ${result.archetype} — ${result.primary_percent}% ${result.primary_character} and ${result.secondary_percent}% ${result.secondary_character}. Which anime character are you?`}
+                title={`I am ${result.primary_character}`}
               />
             </div>
 
-            {/* Retry */}
             <Button variant="outline" size="md" onClick={reset} className="w-full animate-fade-in-up stagger-5">
               ← Take the quiz again
             </Button>

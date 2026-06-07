@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getRoastCache, setRoastCache } from "@/lib/db";
 import { getUserProfile, getUserAnimeList, summarizeMALList } from "@/lib/mal";
 import { getAniListSummary } from "@/lib/anilist";
-import { generateRoast } from "@/lib/claude";
+import { generateRoast, type RoastResult } from "@/lib/claude";
 import { cacheGet, cacheSet, cacheIncr } from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
@@ -33,22 +33,35 @@ export async function POST(req: NextRequest) {
 
     const cacheKey = `roast:${platform}:${username.toLowerCase()}`;
 
-    // Redis cache
-    const redisCache = await cacheGet<{ roast_text: string; stats: unknown; username: string }>(cacheKey);
+    // Redis cache (stores full structured result)
+    const redisCache = await cacheGet<{ roast_result: RoastResult; username: string; stats: unknown; platform: string }>(cacheKey);
     if (redisCache) return NextResponse.json(redisCache);
 
-    // DB cache (MAL only for backward compat)
+    // DB cache — try to parse as new JSON format or legacy string
     if (platform === "mal") {
       const dbCache = await getRoastCache(username.toLowerCase());
       if (dbCache) {
-        const result = {
-          roast_text: dbCache.roast_text,
+        // Try to parse new JSON-encoded roast_text
+        let roastResult: RoastResult | null = null;
+        try {
+          const parsed = JSON.parse(dbCache.roast_text);
+          if (parsed.personality_type) roastResult = parsed as RoastResult;
+        } catch { /* legacy plain text */ }
+
+        if (roastResult) {
+          const result = { roast_result: roastResult, username: dbCache.username, stats: (dbCache.mal_data as { summary?: unknown })?.summary, platform: "mal" };
+          await cacheSet(cacheKey, result, 86400);
+          return NextResponse.json(result);
+        }
+        // Legacy: plain roast text — return with minimal structure
+        const legacyResult = {
+          roast_result: { roast_text: dbCache.roast_text, personality_type: null, roast_tier: null, taste_dna: null, taste_sins: [], redemption_arc: [] },
           username: dbCache.username,
           stats: (dbCache.mal_data as { summary?: unknown })?.summary,
           platform: "mal",
         };
-        await cacheSet(cacheKey, result, 86400);
-        return NextResponse.json(result);
+        await cacheSet(cacheKey, legacyResult, 86400);
+        return NextResponse.json(legacyResult);
       }
     }
 
@@ -74,13 +87,14 @@ export async function POST(req: NextRequest) {
       summary = summarizeMALList(list, profile);
     }
 
-    const roastText = await generateRoast(summary);
+    const roastResult = await generateRoast(summary);
 
     if (platform === "mal") {
-      await setRoastCache(username.toLowerCase(), { summary }, roastText);
+      // Store JSON-encoded roast result in roast_text field
+      await setRoastCache(username.toLowerCase(), { summary }, JSON.stringify(roastResult));
     }
 
-    const result = { roast_text: roastText, username: summary.username, stats: summary, platform };
+    const result = { roast_result: roastResult, username: summary.username, stats: summary, platform };
     await cacheSet(cacheKey, result, 86400);
 
     return NextResponse.json(result);

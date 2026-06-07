@@ -22,6 +22,14 @@ export interface RoastCache {
   expires_at: string;
 }
 
+export interface VerdictMetadata {
+  hook?: string;
+  one_line?: string;
+  binge_score?: number;
+  vibe_tags?: string[];
+  similar_anime?: string[];
+}
+
 export interface Verdict {
   id: string;
   anime_slug: string;
@@ -33,6 +41,7 @@ export interface Verdict {
   for_who: string;
   not_for_who: string;
   test_episode?: string;
+  metadata?: VerdictMetadata;
   view_count: number;
   created_at: string;
 }
@@ -44,6 +53,9 @@ export interface CharacterMatch {
   character_name: string;
   anime_title: string;
   explanation: string;
+  secondary_character?: string;
+  secondary_anime?: string;
+  archetype?: string;
   card_image_url?: string;
   share_count: number;
   created_at: string;

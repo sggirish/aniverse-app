@@ -5,20 +5,20 @@ import { cacheIncr } from "@/lib/redis";
 import { randomUUID } from "crypto";
 
 const VALID_OPTIONS = new Set(["A", "B", "C", "D"]);
+const ALL_QUESTIONS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"] as const;
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const answers: QuizAnswers = body.answers;
 
-    if (!answers?.q1 || !answers?.q2 || !answers?.q3 || !answers?.q4 || !answers?.q5) {
-      return NextResponse.json({ error: "All 5 answers are required" }, { status: 400 });
+    if (!answers) {
+      return NextResponse.json({ error: "Answers are required" }, { status: 400 });
     }
 
-    // Validate each answer is strictly A/B/C/D
-    for (const key of ["q1", "q2", "q3", "q4", "q5"] as const) {
-      if (!VALID_OPTIONS.has(answers[key])) {
-        return NextResponse.json({ error: "Invalid answer value" }, { status: 400 });
+    for (const key of ALL_QUESTIONS) {
+      if (!answers[key] || !VALID_OPTIONS.has(answers[key])) {
+        return NextResponse.json({ error: `Answer for ${key} is required and must be A, B, C, or D` }, { status: 400 });
       }
     }
 
@@ -35,19 +35,39 @@ export async function POST(req: NextRequest) {
     const match = await generateCharacterMatch(answers);
     const sessionId = randomUUID();
 
-    const saved = await createCharacterMatch({
+    // Try full insert; fall back without new columns if migration hasn't run yet
+    let saved = await createCharacterMatch({
       session_id: sessionId,
       answers: answers as unknown as Record<string, string>,
-      character_name: match.character_name,
-      anime_title: match.anime_title,
+      character_name: match.primary_character,
+      anime_title: match.primary_anime,
       explanation: match.explanation,
-    });
+      secondary_character: match.secondary_character,
+      secondary_anime: match.secondary_anime,
+      archetype: match.archetype,
+    }).catch(() => null);
+
+    if (!saved) {
+      saved = await createCharacterMatch({
+        session_id: sessionId,
+        answers: answers as unknown as Record<string, string>,
+        character_name: match.primary_character,
+        anime_title: match.primary_anime,
+        explanation: match.explanation,
+      }).catch(() => null);
+    }
 
     return NextResponse.json({
       id: saved?.id ?? sessionId,
-      character_name: match.character_name,
-      anime_title: match.anime_title,
+      primary_character: match.primary_character,
+      primary_anime: match.primary_anime,
+      primary_percent: match.primary_percent,
+      secondary_character: match.secondary_character,
+      secondary_anime: match.secondary_anime,
+      secondary_percent: match.secondary_percent,
+      archetype: match.archetype,
       explanation: match.explanation,
+      shadow_note: match.shadow_note,
       session_id: sessionId,
     });
   } catch (err) {

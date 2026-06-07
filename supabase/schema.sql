@@ -24,23 +24,35 @@ CREATE TABLE IF NOT EXISTS verdicts (
   for_who      text NOT NULL,
   not_for_who  text NOT NULL,
   test_episode text,
+  metadata     jsonb,
   view_count   int DEFAULT 0,
   created_at   timestamptz DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_verdicts_slug    ON verdicts(anime_slug);
 CREATE INDEX IF NOT EXISTS idx_verdicts_popular ON verdicts(view_count DESC);
 
+-- Migration: add metadata column if upgrading existing DB
+ALTER TABLE verdicts ADD COLUMN IF NOT EXISTS metadata jsonb;
+
 CREATE TABLE IF NOT EXISTS character_matches (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id     text NOT NULL,
-  answers        jsonb NOT NULL,
-  character_name text NOT NULL,
-  anime_title    text NOT NULL,
-  explanation    text NOT NULL,
-  card_image_url text,
-  share_count    int DEFAULT 0,
-  created_at     timestamptz DEFAULT now()
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id          text NOT NULL,
+  answers             jsonb NOT NULL,
+  character_name      text NOT NULL,
+  anime_title         text NOT NULL,
+  explanation         text NOT NULL,
+  secondary_character text,
+  secondary_anime     text,
+  archetype           text,
+  card_image_url      text,
+  share_count         int DEFAULT 0,
+  created_at          timestamptz DEFAULT now()
 );
+
+-- Migration: add new character match columns if upgrading existing DB
+ALTER TABLE character_matches ADD COLUMN IF NOT EXISTS secondary_character text;
+ALTER TABLE character_matches ADD COLUMN IF NOT EXISTS secondary_anime text;
+ALTER TABLE character_matches ADD COLUMN IF NOT EXISTS archetype text;
 CREATE INDEX IF NOT EXISTS idx_char_session ON character_matches(session_id);
 -- Partial index for efficient 30-day cleanup
 CREATE INDEX IF NOT EXISTS idx_char_created ON character_matches(created_at);

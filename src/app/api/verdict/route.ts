@@ -31,7 +31,16 @@ export async function POST(req: NextRequest) {
 
     const verdictData = await generateVerdict(anime);
 
-    const saved = await setVerdict({
+    const verdictMeta = {
+      hook: verdictData.hook,
+      one_line: verdictData.one_line,
+      binge_score: verdictData.binge_score,
+      vibe_tags: verdictData.vibe_tags,
+      similar_anime: verdictData.similar_anime,
+    };
+
+    // Try with metadata column; fall back without it if migration hasn't run
+    let saved = await setVerdict({
       anime_slug: slug,
       anime_title: anime.title,
       mal_id: anime.mal_id,
@@ -41,9 +50,29 @@ export async function POST(req: NextRequest) {
       for_who: verdictData.for_who,
       not_for_who: verdictData.not_for_who,
       test_episode: verdictData.test_episode,
-    });
+      metadata: verdictMeta,
+    }).catch(() => null);
 
-    return NextResponse.json(saved ?? { ...verdictData, anime_slug: slug, anime_title: anime.title });
+    // If metadata column doesn't exist yet, retry without it
+    if (!saved) {
+      saved = await setVerdict({
+        anime_slug: slug,
+        anime_title: anime.title,
+        mal_id: anime.mal_id,
+        image_url: anime.image_url,
+        verdict: verdictData.verdict,
+        reasoning: verdictData.reasons.join("\n"),
+        for_who: verdictData.for_who,
+        not_for_who: verdictData.not_for_who,
+        test_episode: verdictData.test_episode,
+      }).catch(() => null);
+    }
+
+    const responseData = saved
+      ? { ...saved, metadata: saved.metadata ?? verdictMeta }
+      : { ...verdictData, anime_slug: slug, anime_title: anime.title, metadata: verdictMeta };
+
+    return NextResponse.json(responseData);
   } catch (err) {
     console.error("[verdict]", err);
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
