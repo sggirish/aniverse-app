@@ -1,4 +1,4 @@
-const BASE = "https://aniverse-app-pi.vercel.app";
+const BASE = "https://anideck.app";
 
 const endpoints = [
   {
