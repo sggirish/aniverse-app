@@ -11,11 +11,11 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  title: { default: "AniVerse — Free AI Anime Tools", template: "%s | AniVerse" },
+  title: { default: "AniDeck — Free AI Anime Tools", template: "%s | AniDeck" },
   description: "Roast your anime taste, get a verdict on any anime, find your character match. 100% free, no account needed.",
   openGraph: {
     type: "website",
-    siteName: "AniVerse",
+    siteName: "AniDeck",
     images: [{ url: "/og.png", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },
@@ -117,7 +117,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-xs text-[#9CA3AF]">
             <div className="flex items-center gap-2">
               <Logo />
-              <span>AniVerse · Built by Bhairav · 2026</span>
+              <span>AniDeck · Built by Bhairav · 2026</span>
             </div>
             <div className="flex gap-4 flex-wrap">
               <Link href="/games"    className="hover:text-[#6B7280]">Games</Link>
@@ -127,7 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/api-docs" className="hover:text-[#6B7280]">API</Link>
               <Link href="/privacy"  className="hover:text-[#6B7280]">Privacy</Link>
               <Link href="/terms"    className="hover:text-[#6B7280]">Terms</Link>
-              <a href="https://buymeacoffee.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#6B7280]">Support AniVerse ☕</a>
+              <a href="https://buymeacoffee.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#6B7280]">Support AniDeck ☕</a>
             </div>
           </div>
         </footer>

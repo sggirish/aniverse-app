@@ -121,7 +121,7 @@ export default function ApiDocsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-3">
-            <span className="text-[#3B82F6]">🔌</span> AniVerse API
+            <span className="text-[#3B82F6]">🔌</span> AniDeck API
           </h1>
           <p className="text-gray-400">
             Free REST API. No auth required. Fair use limits apply.

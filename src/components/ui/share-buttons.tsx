@@ -30,7 +30,7 @@ export function ShareButtons({ url, text, title }: ShareButtonsProps) {
   const nativeShare = async () => {
     if (!navigator.share) return;
     try {
-      await navigator.share({ title: title ?? "AniVerse", text, url: fullUrl });
+      await navigator.share({ title: title ?? "AniDeck", text, url: fullUrl });
       setShared(true);
       setTimeout(() => setShared(false), 2000);
     } catch { /* user cancelled */ }
@@ -50,7 +50,7 @@ export function ShareButtons({ url, text, title }: ShareButtonsProps) {
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold text-[#0F0F0F] truncate">{title ?? "AniVerse"}</p>
+          <p className="text-xs font-bold text-[#0F0F0F] truncate">{title ?? "AniDeck"}</p>
           <p className="text-[10px] text-[#9CA3AF] truncate">{fullUrl}</p>
         </div>
         <button onClick={copy}

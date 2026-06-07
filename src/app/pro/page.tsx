@@ -18,10 +18,10 @@ export default function ProPage() {
             <span className="text-purple-400 text-sm font-medium">Coming Soon</span>
           </div>
           <h1 className="text-5xl font-black mb-4">
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">AniVerse Pro</span>
+            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">AniDeck Pro</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-lg mx-auto">
-            For the anime fan who takes their hobby seriously. Unlock the full power of AniVerse.
+            For the anime fan who takes their hobby seriously. Unlock the full power of AniDeck.
           </p>
         </div>
 

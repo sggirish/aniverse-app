@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = meta?.hook ?? verdict.for_who ?? verdict.reasoning.slice(0, 140);
 
   return {
-    title: `Is ${verdict.anime_title} Worth Watching? ${verdictLabel} — AniVerse`,
+    title: `Is ${verdict.anime_title} Worth Watching? ${verdictLabel} — AniDeck`,
     description,
     openGraph: {
       title: `${verdict.anime_title}: ${verdictLabel}`,

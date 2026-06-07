@@ -11,11 +11,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   return {
     title: `${username}'s anime taste got roasted by AI`,
-    description: `See what AI thinks of ${username}'s anime taste on AniVerse — the free AI anime roast tool`,
+    description: `See what AI thinks of ${username}'s anime taste on AniDeck — the free AI anime roast tool`,
     robots: { index: false, follow: false },
     openGraph: {
       title: `${username}'s anime taste got roasted 🔥`,
-      description: `AniVerse roasted ${username}'s anime taste. See what AI said.`,
+      description: `AniDeck roasted ${username}'s anime taste. See what AI said.`,
       images: [`/api/og/roast?username=${username}`],
     },
     twitter: { card: "summary_large_image" },
@@ -50,7 +50,7 @@ export default async function RoastResultPage({ params }: Props) {
         <div className="bg-[#FAF9F6] border border-[#E5E7EB] rounded-2xl p-7 space-y-4 mb-6">
           <div className="flex items-center justify-between">
             <span className="font-bold text-base">{cache.username}</span>
-            <span className="text-xs text-[#6B7280] font-mono">MAL Roast by AniVerse</span>
+            <span className="text-xs text-[#6B7280] font-mono">MAL Roast by AniDeck</span>
           </div>
           <div className="border-t border-[#E5E7EB]" />
           <p className="text-base leading-relaxed text-[#1F1F1F]"

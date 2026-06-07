@@ -132,7 +132,7 @@ export default async function HomePage() {
             <div className="flex items-center gap-3">
               <span className="text-3xl">🎮</span>
               <div>
-                <p className="font-black text-lg text-[#8B5CF6]">AniVerse Games</p>
+                <p className="font-black text-lg text-[#8B5CF6]">AniDeck Games</p>
                 <p className="text-xs text-[#9CA3AF]">Compete on leaderboards · Challenge friends</p>
               </div>
             </div>

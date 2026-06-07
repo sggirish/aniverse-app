@@ -489,7 +489,7 @@ export default function RoastPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Something went wrong");
       setResult(data);
-      localStorage.setItem("aniverse_used_tool", "1");
+      localStorage.setItem("anideck_used_tool", "1");
       window.plausible?.("tool_used", { props: { tool: "roast", platform: tab } });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

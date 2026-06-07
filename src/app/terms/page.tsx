@@ -9,7 +9,7 @@ export default function TermsPage() {
       <section className="mb-8">
         <h2 className="text-lg font-bold mb-3">The service</h2>
         <p className="text-sm leading-relaxed text-[#6B7280]">
-          AniVerse provides AI-generated anime tools (Anime Roast, Verdict Engine, Character Match) for entertainment purposes. By using AniVerse you agree to these terms.
+          AniDeck provides AI-generated anime tools (Anime Roast, Verdict Engine, Character Match) for entertainment purposes. By using AniDeck you agree to these terms.
         </p>
       </section>
 
@@ -24,7 +24,7 @@ export default function TermsPage() {
         <h2 className="text-lg font-bold mb-3">Acceptable use</h2>
         <ul className="text-sm text-[#6B7280] space-y-2 list-disc pl-5">
           <li>Do not attempt to abuse, circumvent, or stress-test our rate limits.</li>
-          <li>Do not use AniVerse to generate content intended to harass or defame individuals.</li>
+          <li>Do not use AniDeck to generate content intended to harass or defame individuals.</li>
           <li>Only roast MyAnimeList profiles you own or have explicit permission to roast.</li>
           <li>Do not attempt to inject adversarial prompts into our AI inputs.</li>
           <li>Automated or scripted use of the AI endpoints is not permitted.</li>
@@ -34,7 +34,7 @@ export default function TermsPage() {
       <section className="mb-8">
         <h2 className="text-lg font-bold mb-3">Disclaimers</h2>
         <ul className="text-sm text-[#6B7280] space-y-2 list-disc pl-5">
-          <li>AniVerse is provided <strong>&quot;as is&quot;</strong> without warranty of any kind, express or implied.</li>
+          <li>AniDeck is provided <strong>&quot;as is&quot;</strong> without warranty of any kind, express or implied.</li>
           <li>We are not responsible for the content of AI-generated outputs.</li>
           <li>We are not liable for any damages arising from use of this service.</li>
           <li>The service may be unavailable, rate-limited, or discontinued at any time.</li>
@@ -44,14 +44,14 @@ export default function TermsPage() {
       <section className="mb-8">
         <h2 className="text-lg font-bold mb-3">Affiliate links</h2>
         <p className="text-sm leading-relaxed text-[#6B7280]">
-          AniVerse contains affiliate links to Crunchyroll and NordVPN. We earn a small commission at no cost to you if you purchase through these links. We only link to services relevant to anime watching.
+          AniDeck contains affiliate links to Crunchyroll and NordVPN. We earn a small commission at no cost to you if you purchase through these links. We only link to services relevant to anime watching.
         </p>
       </section>
 
       <section className="mb-8">
         <h2 className="text-lg font-bold mb-3">Third-party content</h2>
         <p className="text-sm leading-relaxed text-[#6B7280]">
-          AniVerse is not affiliated with, endorsed by, or sponsored by MyAnimeList, Crunchyroll, NordVPN, Anthropic, or any anime studio or publisher. Anime titles, character names, and related trademarks are the property of their respective owners.
+          AniDeck is not affiliated with, endorsed by, or sponsored by MyAnimeList, Crunchyroll, NordVPN, Anthropic, or any anime studio or publisher. Anime titles, character names, and related trademarks are the property of their respective owners.
         </p>
       </section>
 

@@ -54,7 +54,7 @@ export default function GamesPage() {
           <div className="flex items-center gap-2 mb-4">
             <span className="text-3xl">🎮</span>
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-[#8B5CF6] block">AniVerse Games</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-[#8B5CF6] block">AniDeck Games</span>
               <span className="text-xs text-[#9CA3AF]">Free · No account · AI-powered</span>
             </div>
           </div>

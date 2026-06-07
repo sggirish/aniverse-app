@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
           <p style={{ fontSize: 20, color: "#6B7280", lineHeight: 1.5 }}>{forWho}</p>
         )}
         <div style={{ marginTop: "auto", borderTop: "1px solid #E5E7EB", paddingTop: 20, color: "#9CA3AF", fontSize: 14 }}>
-          aniverse.app/watch/{slug}
+          anideck.app/watch/{slug}
         </div>
       </div>
     ),

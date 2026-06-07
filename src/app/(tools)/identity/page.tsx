@@ -140,7 +140,7 @@ export default function IdentityPage() {
               </div>
 
               <div className="mt-6 pt-4 border-t border-[#2a2a3a] text-center">
-                <p className="text-xs text-gray-600">AniVerse Identity Card • {new Date().getFullYear()}</p>
+                <p className="text-xs text-gray-600">AniDeck Identity Card • {new Date().getFullYear()}</p>
               </div>
             </div>
           </div>

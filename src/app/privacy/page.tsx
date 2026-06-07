@@ -31,7 +31,7 @@ export default function PrivacyPage() {
       <section className="mb-8">
         <h2 className="text-lg font-bold mb-3">Cookies</h2>
         <p className="text-sm leading-relaxed text-[#6B7280]">
-          AniVerse itself does not set tracking cookies. We store two items in your browser&apos;s <code className="text-xs bg-[#F3F4F6] px-1 py-0.5 rounded">localStorage</code> (not cookies): a flag when you use a tool (to show the Buy Me a Coffee button), and a flag when you acknowledge this cookie banner.
+          AniDeck itself does not set tracking cookies. We store two items in your browser&apos;s <code className="text-xs bg-[#F3F4F6] px-1 py-0.5 rounded">localStorage</code> (not cookies): a flag when you use a tool (to show the Buy Me a Coffee button), and a flag when you acknowledge this cookie banner.
         </p>
         <p className="text-sm leading-relaxed text-[#6B7280] mt-3">
           <strong>Google AdSense</strong>, if enabled on your visit, may set third-party cookies for ad personalisation. You can opt out via <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="underline">Google Ad Settings</a>. Affiliate links (Crunchyroll, NordVPN) are standard HTTP links — no tracking pixels or cookies from us.

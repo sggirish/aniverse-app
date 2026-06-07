@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
           <span style={{ fontSize: 14, fontWeight: 700, color: "#2563EB", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-            Character Match · AniVerse
+            Character Match · AniDeck
           </span>
         </div>
         <p style={{ fontSize: 20, color: "#6B7280", marginBottom: 8 }}>You are</p>
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
           </p>
         )}
         <div style={{ marginTop: "auto", color: "#9CA3AF", fontSize: 14 }}>
-          aniverse.app/character/{id}
+          anideck.app/character/{id}
         </div>
       </div>
     ),

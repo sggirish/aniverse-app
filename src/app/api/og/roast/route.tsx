@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
           &ldquo;{roastText}&rdquo;
         </p>
         <div style={{ borderTop: "1px solid #E5E7EB", paddingTop: 20, color: "#9CA3AF", fontSize: 14 }}>
-          aniverse.app/roast/{username}
+          anideck.app/roast/{username}
         </div>
       </div>
     ),

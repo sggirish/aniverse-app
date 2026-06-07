@@ -150,7 +150,7 @@ export default function CharacterPage() {
         if (!res.ok) throw new Error(data.error ?? "Something went wrong");
         setResult(data);
         setStep(QUESTIONS.length + 1);
-        localStorage.setItem("aniverse_used_tool", "1");
+        localStorage.setItem("anideck_used_tool", "1");
         window.plausible?.("tool_used", { props: { tool: "character" } });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong");

@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const match = await getCharacterMatch(id);
   if (!match) return { title: "Character Match" };
   return {
-    title: `I got ${match.character_name} on AniVerse`,
+    title: `I got ${match.character_name} on AniDeck`,
     description: match.explanation.slice(0, 160),
     robots: { index: false, follow: false },
     openGraph: {
@@ -62,7 +62,7 @@ export default async function CharacterResultPage({ params }: Props) {
 
         <ShareButtons
           url={`/character/${id}`}
-          text={`I got ${match.character_name} from ${match.anime_title} on AniVerse 👁️`}
+          text={`I got ${match.character_name} from ${match.anime_title} on AniDeck 👁️`}
         />
 
         <div className="mt-8 pt-6 border-t border-[#E5E7EB]">
