@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       anime_slug: slug,
       anime_title: anime.title,
       mal_id: anime.mal_id,
+      image_url: anime.image_url,
       verdict: verdictData.verdict,
       reasoning: verdictData.reasons.join("\n"),
       for_who: verdictData.for_who,

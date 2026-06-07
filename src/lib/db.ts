@@ -27,6 +27,7 @@ export interface Verdict {
   anime_slug: string;
   anime_title: string;
   mal_id?: number;
+  image_url?: string;
   verdict: "WATCH" | "SKIP" | "WAIT";
   reasoning: string;
   for_who: string;

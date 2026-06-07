@@ -21,11 +21,23 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
+function Logo() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="28" height="28" rx="8" fill="#0F0F0F"/>
+      {/* stylised A — two diagonal strokes + crossbar */}
+      <path d="M7 21L14 7L21 21" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9.8 16.5H18.2" stroke="white" strokeWidth="2.4" strokeLinecap="round"/>
+      {/* small accent dot — anime eye motif */}
+      <circle cx="14" cy="12" r="1.2" fill="#DC2626"/>
+    </svg>
+  );
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <head>
-        {/* Plausible Analytics — privacy-first, cookieless */}
         {plausibleDomain && (
           <script
             defer
@@ -33,7 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             src="https://plausible.io/js/script.tagged-events.js"
           />
         )}
-        {/* Google AdSense — lazy loaded after content */}
         {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && (
           <script
             async
@@ -43,20 +54,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className="min-h-full flex flex-col bg-[#FAFAF9]">
+
         {/* Desktop header */}
-        <header className="border-b border-[#E5E7EB] bg-white sticky top-0 z-20 hidden sm:block">
+        <header className="border-b border-[#E5E7EB] bg-white/90 backdrop-blur-sm sticky top-0 z-20 hidden sm:block">
           <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black tracking-tighter hover:opacity-80 transition-opacity">
-              ANIVERSE
+            <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+              <Logo />
+              <span className="text-lg font-black tracking-tight">ANIVERSE</span>
             </Link>
             <nav className="flex items-center gap-1">
               {[
-                { href: "/roast",     label: "🔥 Roast" },
-                { href: "/watch",     label: "▶ Verdict" },
-                { href: "/character", label: "◉ Character" },
+                { href: "/roast",     label: "🔥 Roast",     color: "hover:text-[#DC2626]" },
+                { href: "/watch",     label: "▶ Verdict",    color: "hover:text-[#16A34A]" },
+                { href: "/character", label: "◉ Character",  color: "hover:text-[#2563EB]" },
               ].map((n) => (
                 <Link key={n.href} href={n.href}
-                  className="text-sm font-medium px-3 py-1.5 rounded-lg text-[#6B7280] hover:text-[#0F0F0F] hover:bg-[#F3F4F6] transition-all">
+                  className={`text-sm font-medium px-3 py-1.5 rounded-lg text-[#6B7280] ${n.color} hover:bg-[#F3F4F6] transition-all`}>
                   {n.label}
                 </Link>
               ))}
@@ -65,9 +78,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         {/* Mobile header */}
-        <header className="border-b border-[#E5E7EB] bg-white sticky top-0 z-20 sm:hidden">
-          <div className="px-4 h-12 flex items-center">
-            <Link href="/" className="text-lg font-black tracking-tighter">ANIVERSE</Link>
+        <header className="border-b border-[#E5E7EB] bg-white/90 backdrop-blur-sm sticky top-0 z-20 sm:hidden">
+          <div className="px-4 h-12 flex items-center gap-2">
+            <Logo />
+            <Link href="/" className="text-base font-black tracking-tight">ANIVERSE</Link>
           </div>
         </header>
 
@@ -76,12 +90,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Mobile bottom tab bar */}
-        <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-20">
+        <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB] z-20">
           <div className="grid grid-cols-3 h-16">
             {[
-              { href: "/roast",     icon: "🔥", label: "Roast" },
-              { href: "/watch",     icon: "▶",  label: "Verdict" },
-              { href: "/character", icon: "◉",  label: "Character" },
+              { href: "/roast",     icon: "🔥", label: "Roast",     active: "#DC2626" },
+              { href: "/watch",     icon: "▶",  label: "Verdict",   active: "#16A34A" },
+              { href: "/character", icon: "◉",  label: "Character", active: "#2563EB" },
             ].map((t) => (
               <Link key={t.href} href={t.href}
                 className="flex flex-col items-center justify-center gap-0.5 text-[#6B7280] hover:text-[#0F0F0F] transition-colors">
@@ -95,7 +109,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Footer */}
         <footer className="border-t border-[#E5E7EB] bg-white py-6 hidden sm:block">
           <div className="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-xs text-[#9CA3AF]">
-            <span>AniVerse · Built by Girish R. · 2026</span>
+            <div className="flex items-center gap-2">
+              <Logo />
+              <span>AniVerse · Built by Bhairav · 2026</span>
+            </div>
             <div className="flex gap-4">
               <Link href="/privacy" className="hover:text-[#6B7280]">Privacy</Link>
               <Link href="/terms"   className="hover:text-[#6B7280]">Terms</Link>
@@ -104,10 +121,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </footer>
 
-        {/* Buy Me a Coffee — shows after user has used a tool */}
         <BuyMeCoffee />
-
-        {/* Cookie consent — only shown when AdSense is enabled */}
         <CookieBanner />
       </body>
     </html>

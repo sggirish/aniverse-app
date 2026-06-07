@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { getVerdict, getTrendingVerdicts, getAllVerdictSlugs } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { crunchyrollLink, nordvpnLink } from "@/lib/affiliates";
 import { ShareButtons } from "@/components/ui/share-buttons";
 import { AdUnit } from "@/components/ads/AdUnit";
@@ -29,11 +30,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const verdictLabel = verdict.verdict === "WATCH" ? "✅ WATCH" : verdict.verdict === "SKIP" ? "❌ SKIP" : "⏳ WAIT";
   return {
     title: `Is ${verdict.anime_title} Worth Watching? ${verdictLabel} — AniVerse`,
-    description: `${verdict.for_who} ${verdict.reasoning.slice(0, 160)}`,
+    description: `${verdict.for_who} ${verdict.reasoning.slice(0, 140)}`,
     openGraph: {
       title: `${verdict.anime_title}: ${verdictLabel}`,
       description: verdict.for_who,
-      images: [`/api/og/verdict?slug=${slug}`],
+      images: verdict.image_url
+        ? [{ url: verdict.image_url, width: 225, height: 320 }, { url: `/api/og/verdict?slug=${slug}` }]
+        : [`/api/og/verdict?slug=${slug}`],
     },
     twitter: { card: "summary_large_image" },
   };
@@ -47,10 +50,28 @@ export default async function VerdictPage({ params }: Props) {
   const related = await getTrendingVerdicts(4);
   const others = related.filter((r) => r.anime_slug !== slug).slice(0, 3);
 
-  const verdictConfig = {
-    WATCH: { label: "WATCH", bg: "bg-green-50", border: "border-green-200", text: "text-green-700", badge: "bg-green-500", icon: "✅" },
-    SKIP:  { label: "SKIP",  bg: "bg-red-50",   border: "border-red-200",   text: "text-red-700",   badge: "bg-red-500",   icon: "❌" },
-    WAIT:  { label: "WAIT",  bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-700", badge: "bg-amber-500", icon: "⏳" },
+  const cfg = {
+    WATCH: {
+      label: "WATCH",
+      bg: "bg-green-50", border: "border-green-200", text: "text-green-700",
+      badge: "bg-green-500", badgeText: "text-white",
+      heroBg: "from-green-50 to-[#FAFAF9]",
+      icon: "✅", iconBig: "🟢",
+    },
+    SKIP: {
+      label: "SKIP",
+      bg: "bg-red-50", border: "border-red-200", text: "text-red-700",
+      badge: "bg-red-500", badgeText: "text-white",
+      heroBg: "from-red-50 to-[#FAFAF9]",
+      icon: "❌", iconBig: "🔴",
+    },
+    WAIT: {
+      label: "WAIT",
+      bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-700",
+      badge: "bg-amber-500", badgeText: "text-white",
+      heroBg: "from-amber-50 to-[#FAFAF9]",
+      icon: "⏳", iconBig: "🟡",
+    },
   }[verdict.verdict];
 
   const reasons = verdict.reasoning.split("\n").filter(Boolean);
@@ -66,85 +87,121 @@ export default async function VerdictPage({ params }: Props) {
         "description": verdict.for_who,
       })}} />
 
-      <div className="max-w-2xl mx-auto px-4 py-16">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-[#9CA3AF] mb-8">
-          <Link href="/watch" className="hover:text-[#6B7280]">Verdict Engine</Link>
-          <span>/</span>
-          <span>{verdict.anime_title}</span>
-        </div>
+      {/* Hero band */}
+      <div className={`bg-gradient-to-b ${cfg.heroBg} border-b border-[#E5E7EB]`}>
+        <div className="max-w-2xl mx-auto px-4 pt-10 pb-8">
 
-        {/* Title */}
-        <div className="mb-8 animate-fade-in-up">
-          <p className="text-xs text-[#9CA3AF] mb-2">Is it worth watching?</p>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-4">{verdict.anime_title}</h1>
-
-          {/* Verdict badge */}
-          <div className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border ${verdictConfig.bg} ${verdictConfig.border}`}>
-            <span className="text-xl">{verdictConfig.icon}</span>
-            <span className={`text-2xl font-black ${verdictConfig.text}`}>{verdictConfig.label}</span>
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-xs text-[#9CA3AF] mb-6">
+            <Link href="/watch" className="hover:text-[#6B7280] transition-colors">Verdict Engine</Link>
+            <span>/</span>
+            <span className="truncate">{verdict.anime_title}</span>
           </div>
+
+          {/* Poster + title row */}
+          <div className="flex gap-5 items-start mb-6 animate-fade-in-up">
+            {verdict.image_url && (
+              <div className="shrink-0">
+                <Image
+                  src={verdict.image_url}
+                  alt={verdict.anime_title}
+                  width={96}
+                  height={136}
+                  className="rounded-xl shadow-md poster-img object-cover"
+                />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-[#9CA3AF] mb-1.5 font-medium uppercase tracking-wide">Should you watch?</p>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight mb-4">{verdict.anime_title}</h1>
+
+              {/* Verdict badge */}
+              <div className={`verdict-badge inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl border ${cfg.bg} ${cfg.border}`}>
+                <span className="text-2xl">{cfg.icon}</span>
+                <span className={`text-2xl sm:text-3xl font-black ${cfg.text}`}>{cfg.label}</span>
+              </div>
+            </div>
+          </div>
+
         </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-5">
 
         {/* Reasons */}
-        <div className={`rounded-2xl border p-6 mb-5 animate-fade-in-up stagger-1 ${verdictConfig.bg} ${verdictConfig.border}`}>
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#6B7280] mb-3">Why</p>
-          <ul className="space-y-2">
+        <div className={`rounded-2xl border p-6 animate-fade-in-up stagger-1 ${cfg.bg} ${cfg.border}`}>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#6B7280] mb-4">Why {cfg.label}?</p>
+          <ul className="space-y-3">
             {reasons.map((r, i) => (
-              <li key={i} className="flex gap-2 text-sm text-[#374151] leading-relaxed">
-                <span className={`font-bold shrink-0 ${verdictConfig.text}`}>{i + 1}.</span>
-                {r}
+              <li key={i} className="flex gap-3 text-sm text-[#374151] leading-relaxed">
+                <span className={`font-black text-base shrink-0 ${cfg.text}`}>{i + 1}</span>
+                <span>{r}</span>
               </li>
             ))}
           </ul>
         </div>
 
         {/* For / Not for */}
-        <div className="grid grid-cols-2 gap-3 mb-5 animate-fade-in-up stagger-2">
+        <div className="grid grid-cols-2 gap-3 animate-fade-in-up stagger-2">
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
-            <p className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-2">For you if</p>
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-green-500 font-black text-sm">✓</span>
+              <p className="text-xs font-bold text-green-600 uppercase tracking-wide">Watch if</p>
+            </div>
             <p className="text-sm text-[#374151] leading-relaxed">{verdict.for_who}</p>
           </div>
           <div className="bg-white border border-[#E5E7EB] rounded-xl p-4">
-            <p className="text-xs font-semibold text-red-500 uppercase tracking-wide mb-2">Not for you if</p>
+            <div className="flex items-center gap-1.5 mb-2">
+              <span className="text-red-500 font-black text-sm">✕</span>
+              <p className="text-xs font-bold text-red-500 uppercase tracking-wide">Skip if</p>
+            </div>
             <p className="text-sm text-[#374151] leading-relaxed">{verdict.not_for_who}</p>
           </div>
         </div>
 
         {/* Test episode */}
         {verdict.test_episode && (
-          <div className="bg-[#111827] text-white rounded-xl p-4 mb-6 animate-fade-in-up stagger-3">
-            <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide mb-1">Test Episode</p>
-            <p className="text-sm">{verdict.test_episode}</p>
+          <div className="bg-[#111827] text-white rounded-xl p-5 animate-fade-in-up stagger-3">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-base">🧪</span>
+              <p className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wide">Not sure? Try this episode first</p>
+            </div>
+            <p className="text-sm leading-relaxed text-[#E5E7EB]">Episode {verdict.test_episode}</p>
           </div>
         )}
 
-        {/* CTA — Crunchyroll (only on WATCH) */}
+        {/* Crunchyroll CTA — WATCH only */}
         {verdict.verdict === "WATCH" && (
-          <div className="flex items-center justify-between gap-4 p-4 bg-[#F47521]/10 border border-[#F47521]/30 rounded-xl mb-6 animate-fade-in-up stagger-4">
-            <p className="text-sm text-[#374151]">Ready to watch <strong>{verdict.anime_title}</strong>?</p>
+          <div className="flex items-center justify-between gap-4 p-4 bg-[#F47521]/10 border border-[#F47521]/30 rounded-xl animate-fade-in-up stagger-4">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🍊</span>
+              <p className="text-sm text-[#374151]">Watch <strong>{verdict.anime_title}</strong> on Crunchyroll</p>
+            </div>
             <a href={crunchUrl} target="_blank" rel="noopener noreferrer"
-              className="text-xs font-semibold px-3 py-2 bg-[#F47521] text-white rounded-lg hover:opacity-90 shrink-0">
-              Watch on Crunchyroll →
+              className="text-xs font-bold px-4 py-2.5 bg-[#F47521] text-white rounded-xl hover:opacity-90 shrink-0 transition-opacity">
+              Watch Free →
             </a>
           </div>
         )}
 
-        {/* NordVPN — geo-restriction context (all verdicts) */}
-        <div className="flex items-center justify-between gap-4 p-4 bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl mb-6 animate-fade-in-up stagger-4">
-          <p className="text-sm text-[#6B7280]">Some titles are geo-restricted in your region. A VPN helps.</p>
+        {/* NordVPN */}
+        <div className="flex items-center justify-between gap-4 p-4 bg-[#F3F4F6] border border-[#E5E7EB] rounded-xl animate-fade-in-up stagger-4">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">🌐</span>
+            <p className="text-sm text-[#6B7280]">Some titles are geo-restricted. A VPN unlocks them instantly.</p>
+          </div>
           <a href={nordUrl} target="_blank" rel="noopener noreferrer"
-            className="text-xs font-semibold px-3 py-2 bg-[#4687FF] text-white rounded-lg hover:opacity-90 shrink-0">
+            className="text-xs font-bold px-4 py-2.5 bg-[#4687FF] text-white rounded-xl hover:opacity-90 shrink-0 transition-opacity">
             Try NordVPN →
           </a>
         </div>
 
-        {/* AdSense — after result, highest CTR placement */}
-        <AdUnit slot="verdict-result" format="auto" className="mb-6" />
+        {/* Ad */}
+        <AdUnit slot="verdict-result" format="auto" className="my-2" />
 
         {/* Share */}
-        <div className="mb-8 animate-fade-in-up stagger-5">
-          <p className="text-xs text-[#6B7280] font-medium mb-2 uppercase tracking-wide">Share this verdict</p>
+        <div className="animate-fade-in-up stagger-5">
+          <p className="text-xs text-[#6B7280] font-bold mb-3 uppercase tracking-wide">Share this verdict</p>
           <ShareButtons
             url={`/watch/${slug}`}
             text={`AI says ${verdict.verdict}: ${verdict.anime_title} — here's why:`}
@@ -153,14 +210,14 @@ export default async function VerdictPage({ params }: Props) {
 
         {/* Related */}
         {others.length > 0 && (
-          <div className="border-t border-[#E5E7EB] pt-8">
-            <p className="text-xs font-semibold text-[#6B7280] uppercase tracking-wide mb-3">More Verdicts</p>
+          <div className="border-t border-[#E5E7EB] pt-8 animate-fade-in-up stagger-6">
+            <p className="text-xs font-bold text-[#6B7280] uppercase tracking-widest mb-4">More Verdicts</p>
             <div className="space-y-2">
               {others.map((v) => {
                 const c = { WATCH:"bg-green-100 text-green-700", SKIP:"bg-red-100 text-red-700", WAIT:"bg-amber-100 text-amber-700" }[v.verdict] ?? "bg-gray-100 text-gray-600";
                 return (
                   <Link key={v.anime_slug} href={`/watch/${v.anime_slug}`}
-                    className="flex items-center justify-between p-3 bg-white border border-[#E5E7EB] rounded-xl hover:shadow-sm transition-all">
+                    className="flex items-center justify-between p-3.5 bg-white border border-[#E5E7EB] rounded-xl hover:shadow-sm hover:-translate-y-0.5 transition-all">
                     <span className="text-sm font-medium">{v.anime_title}</span>
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${c}`}>{v.verdict}</span>
                   </Link>
@@ -169,6 +226,7 @@ export default async function VerdictPage({ params }: Props) {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );

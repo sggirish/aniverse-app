@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS verdicts (
   anime_slug   text UNIQUE NOT NULL,
   anime_title  text NOT NULL,
   mal_id       int,
+  image_url    text,
   verdict      text CHECK (verdict IN ('WATCH','SKIP','WAIT')) NOT NULL,
   reasoning    text NOT NULL,
   for_who      text NOT NULL,
