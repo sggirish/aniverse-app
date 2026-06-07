@@ -204,7 +204,8 @@ export default async function VerdictPage({ params }: Props) {
           <p className="text-xs text-[#6B7280] font-bold mb-3 uppercase tracking-wide">Share this verdict</p>
           <ShareButtons
             url={`/watch/${slug}`}
-            text={`AI says ${verdict.verdict}: ${verdict.anime_title} — here's why:`}
+            text={`AI verdict on ${verdict.anime_title}: ${verdict.verdict}. Here's why you should or shouldn't watch it:`}
+            title={`${verdict.anime_title}: ${cfg.label}`}
           />
         </div>
 

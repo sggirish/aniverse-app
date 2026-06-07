@@ -283,17 +283,30 @@ export default function CharacterPage() {
             {/* AdSense */}
             <AdUnit slot="character-result" format="auto" />
 
+            {/* Watch the anime CTA */}
+            <div className="bg-[#F0FDF4] border border-green-200 rounded-xl p-4 flex items-center justify-between gap-4 animate-fade-in-up stagger-3">
+              <div>
+                <p className="text-sm font-bold text-[#16A34A]">Watch {result.anime_title}</p>
+                <p className="text-xs text-[#6B7280] mt-0.5">See where your character comes from.</p>
+              </div>
+              <a href={`/watch/${result.anime_title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                className="text-xs font-bold px-3 py-2 bg-[#16A34A] text-white rounded-xl hover:bg-[#15803d] shrink-0 transition-colors">
+                Get verdict →
+              </a>
+            </div>
+
             {/* Share */}
-            <div className="animate-fade-in-up stagger-3">
+            <div className="animate-fade-in-up stagger-4">
               <p className="text-xs text-[#6B7280] font-bold mb-3 uppercase tracking-wide">Share your result</p>
               <ShareButtons
                 url={`/character/${result.id}`}
-                text={`I got ${result.character_name} from ${result.anime_title} on AniVerse — eerily accurate 👁️`}
+                text={`I got ${result.character_name} from ${result.anime_title} on AniVerse — which character are you?`}
+                title={`I am ${result.character_name}`}
               />
             </div>
 
             {/* Retry */}
-            <Button variant="outline" size="md" onClick={reset} className="w-full animate-fade-in-up stagger-4">
+            <Button variant="outline" size="md" onClick={reset} className="w-full animate-fade-in-up stagger-5">
               ← Take the quiz again
             </Button>
           </div>
