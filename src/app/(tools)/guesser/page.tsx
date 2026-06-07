@@ -115,7 +115,7 @@ export default function GuesserPage() {
               Watch, Skip, or Wait?<br /><span className="text-[#16A34A]">You decide.</span>
             </h1>
             <p className="text-[#6B7280] text-base max-w-sm">
-              Claude writes a cryptic vibe description for an anime — no title, no spoilers. Predict the verdict: WATCH, SKIP, or WAIT. Match the AI. Score by accuracy.
+              Our AI writes a cryptic vibe description for an anime — no title, no spoilers. Predict the verdict: WATCH, SKIP, or WAIT. Score by accuracy.
             </p>
           </div>
 
@@ -157,7 +157,7 @@ export default function GuesserPage() {
             <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"/>
             <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/>
           </svg>
-          <p className="font-bold text-[#374151]">Claude generating mystery descriptions…</p>
+          <p className="font-bold text-[#374151]">Generating mystery descriptions…</p>
           <p className="text-xs text-[#9CA3AF]">Takes ~10 seconds</p>
         </div>
       </div>

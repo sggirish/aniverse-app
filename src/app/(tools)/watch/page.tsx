@@ -101,7 +101,7 @@ function WatchPageInner() {
             <span className="text-3xl">🎯</span>
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#16A34A] block">Verdict Engine</span>
-              <span className="text-xs text-[#9CA3AF]">Powered by Claude AI</span>
+              <span className="text-xs text-[#9CA3AF]">AI-powered</span>
             </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-3">
@@ -154,7 +154,7 @@ function WatchPageInner() {
           )}
 
           {/* Autocomplete dropdown */}
-          {open && suggestions.length > 0 && (
+          {open && suggestions.length > 0 && !loading && (
             <div className="absolute top-14 left-0 right-0 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl z-20 overflow-hidden animate-scale-in">
               {suggestions.map((s, i) => (
                 <button key={s.mal_id}

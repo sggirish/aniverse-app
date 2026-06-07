@@ -69,14 +69,14 @@ export default function MoodPage() {
             <span className="text-3xl">🎭</span>
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#7C3AED] block">Mood Finder</span>
-              <span className="text-xs text-[#9CA3AF]">Powered by Claude AI</span>
+              <span className="text-xs text-[#9CA3AF]">AI-powered</span>
             </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-3">
             What to watch<br /><span className="text-[#7C3AED]">tonight?</span>
           </h1>
           <p className="text-[#6B7280] text-base leading-relaxed max-w-md">
-            Pick up to 3 moods. Claude picks 3 perfect anime for exactly how you feel right now. No account needed.
+            Pick up to 3 moods. Our AI picks 3 perfect anime for exactly how you feel right now. No account needed.
           </p>
         </div>
 

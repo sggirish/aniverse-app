@@ -38,7 +38,7 @@ export default async function HomePage() {
             </div>
             <div>
               <p className="font-black text-lg text-[#DC2626] mb-1">Anime Roast</p>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Claude reads your anime list and gives you a full personality breakdown — your Taste DNA, your biggest sins, and your redemption arc.</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed">Our AI reads your anime list and gives you a full personality breakdown — your Taste DNA, your biggest sins, and your redemption arc.</p>
             </div>
             <Link href="/roast"
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#DC2626] text-white rounded-xl text-center hover:bg-[#b91c1c] transition-colors group-hover:shadow-md">
@@ -70,7 +70,7 @@ export default async function HomePage() {
             </div>
             <div>
               <p className="font-black text-lg text-[#2563EB] mb-1">Character Match</p>
-              <p className="text-sm text-[#6B7280] leading-relaxed">8 psychological questions. Claude gives you a primary match, a secondary match, your archetype, and your shadow self.</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed">8 psychological questions. Our AI gives you a primary match, a secondary match, your archetype, and your shadow self.</p>
             </div>
             <Link href="/character"
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#2563EB] text-white rounded-xl text-center hover:bg-[#1d4ed8] transition-colors group-hover:shadow-md">
@@ -86,7 +86,7 @@ export default async function HomePage() {
             </div>
             <div>
               <p className="font-black text-lg text-[#7C3AED] mb-1">Mood Finder</p>
-              <p className="text-sm text-[#6B7280] leading-relaxed">Pick up to 3 moods. Claude picks 3 perfect anime for exactly how you feel right now. The fastest way to decide what to watch tonight.</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed">Pick up to 3 moods. Our AI picks 3 perfect anime for exactly how you feel right now. The fastest way to decide what to watch tonight.</p>
             </div>
             <Link href="/mood"
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#7C3AED] text-white rounded-xl text-center hover:bg-[#6D28D9] transition-colors group-hover:shadow-md">
@@ -133,7 +133,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             {[
               { step: "1", title: "Pick a tool", desc: "Roast your MAL taste, search an anime, or take the character quiz." },
-              { step: "2", title: "Claude analyzes", desc: "Our AI reads real data — your MAL list, anime metadata, your answers — not generic summaries." },
+              { step: "2", title: "AI analyzes", desc: "Our AI reads real data — your MAL list, anime metadata, your answers — not generic summaries." },
               { step: "3", title: "Share your result", desc: "Every result is a shareable card. Screenshots fly. Links load instantly." },
             ].map((s) => (
               <div key={s.step} className="flex flex-col items-center gap-3">

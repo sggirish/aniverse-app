@@ -178,7 +178,7 @@ export default function CharacterPage() {
             <span className="text-3xl">🔮</span>
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#2563EB] block">Character Match</span>
-              <span className="text-xs text-[#9CA3AF]">Powered by Claude AI</span>
+              <span className="text-xs text-[#9CA3AF]">AI-powered</span>
             </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-2">
@@ -186,7 +186,7 @@ export default function CharacterPage() {
             <span className="text-[#2563EB]">character are you?</span>
           </h1>
           <p className="text-[#6B7280] text-base leading-relaxed">
-            8 psychological questions. Claude finds your primary character, your secondary match, and your hidden archetype.
+            8 psychological questions. Our AI finds your primary character, your secondary match, and your hidden archetype.
           </p>
         </div>
 

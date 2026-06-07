@@ -520,14 +520,14 @@ export default function RoastPage() {
             <span className="text-4xl">🔥</span>
             <div>
               <span className="text-xs font-bold uppercase tracking-widest text-[#DC2626] block">Anime Roast</span>
-              <span className="text-xs text-[#9CA3AF]">Powered by Claude AI</span>
+              <span className="text-xs text-[#9CA3AF]">AI-powered</span>
             </div>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-3">
             Get Destroyed.<br /><span className="text-[#DC2626]">Lovingly.</span>
           </h1>
           <p className="text-[#6B7280] text-base leading-relaxed max-w-md">
-            Claude reads your anime list and gives you a brutally honest personality breakdown — your taste DNA, your sins, and how to fix yourself.
+            Our AI reads your anime list and gives you a brutally honest personality breakdown — your taste DNA, your sins, and how to fix yourself.
           </p>
         </div>
 
@@ -553,7 +553,7 @@ export default function RoastPage() {
           <div className="animate-fade-in-up stagger-2">
             <div className="mb-5 px-4 py-3 bg-[#FFF8F5] border border-[#FCA5A5] rounded-xl text-sm text-[#374151]">
               <p className="font-bold text-[#DC2626] mb-0.5">No account needed</p>
-              <p className="text-xs text-[#6B7280]">Search and pick 3–10 anime you&apos;ve watched. Rate them if you want. Claude roasts your taste based on your picks.</p>
+              <p className="text-xs text-[#6B7280]">Search and pick 3–10 anime you&apos;ve watched. Rate them if you want. Our AI roasts your taste based on your picks.</p>
             </div>
             <QuickRoastTab />
           </div>
