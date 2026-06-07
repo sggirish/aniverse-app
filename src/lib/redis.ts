@@ -37,7 +37,7 @@ export async function cacheIncr(key: string, ttlSeconds: number): Promise<number
     if (count === 1) await r.expire(key, ttlSeconds);
     return count;
   } catch {
-    // Redis unavailable — return a large number so rate limit still holds
-    return 9999;
+    // Redis unavailable — allow the request (don't block users when cache is down)
+    return 0;
   }
 }

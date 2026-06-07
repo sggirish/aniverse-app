@@ -281,6 +281,72 @@ Output as JSON:
   return JSON.parse(json) as CharacterMatchResult;
 }
 
+// ── Quick Roast types ────────────────────────────────────────────────────────
+
+export interface QuickAnimeEntry {
+  title: string;
+  rating?: number; // 1-10, optional
+}
+
+export interface QuickRoastResult {
+  personality_type: string;
+  roast_tier: string;
+  taste_dna: TasteDNA;
+  taste_sins: string[];
+  redemption_arc: string[];
+  roast_text: string;
+}
+
+// ── Quick Roast ──────────────────────────────────────────────────────────────
+
+export async function generateQuickRoast(anime: QuickAnimeEntry[], hotTake?: string): Promise<QuickRoastResult> {
+  const listText = anime
+    .map((a) => a.rating != null ? `${a.title} (${a.rating}/10)` : a.title)
+    .join(", ");
+
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 900,
+    system:
+      "You are a brutally honest, witty anime critic who roasts people's taste. You are specific, funny, and loving underneath. You must respond with valid JSON only — no extra text.",
+    messages: [
+      {
+        role: "user",
+        content: `Analyze this person's anime picks and roast their taste:
+
+Their anime list: ${listText}
+${hotTake ? `Their hot take: "${hotTake}"` : ""}
+
+Output as JSON:
+{
+  "personality_type": "Creative nickname for their anime personality (e.g. 'The Shonen Grinder', 'The Hidden Gem Archaeologist', 'The Emotional Masochist')",
+  "roast_tier": "Funny tier label like 'Certified Mid-Tier Weeb' or 'Battle-Hardened Veteran' or 'Confused Normie'",
+  "taste_dna": {
+    "mainstream": <1-10 based on how mainstream their picks are>,
+    "patience": <1-10 based on genre mix>,
+    "darkness": <1-10 based on dark titles>,
+    "emotional_depth": <1-10 based on emotional/heavy titles>,
+    "completion_rate": <1-10 guess based on their picks>
+  },
+  "taste_sins": [
+    "Specific funny callout #1 mentioning actual titles they listed",
+    "Specific funny callout #2",
+    "Specific funny callout #3"
+  ],
+  "redemption_arc": ["First anime they should watch next", "Second anime"],
+  "roast_text": "2-3 sentences of brutally honest but loving roast. Be specific. Reference actual titles they listed. End with a tiny shred of hope."
+}`,
+      },
+    ],
+  });
+
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text response");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON in response");
+  return JSON.parse(json) as QuickRoastResult;
+}
+
 // ── Mood Finder ──────────────────────────────────────────────────────────────
 
 export async function generateMoodRecommendations(moods: string[]): Promise<MoodResult> {

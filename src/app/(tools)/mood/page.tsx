@@ -181,7 +181,7 @@ export default function MoodPage() {
                     <p className="text-sm text-[#374151] leading-relaxed">{rec.why}</p>
                     <div className="mt-3 flex gap-2">
                       <a
-                        href={`/watch/${rec.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`}
+                        href={`/watch?q=${encodeURIComponent(rec.title)}`}
                         className="text-xs font-bold px-3 py-1.5 bg-[#7C3AED] text-white rounded-lg hover:bg-[#6D28D9] transition-colors">
                         Get verdict →
                       </a>

@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { Suspense } from "react";
 
 interface SearchResult {
   mal_id: number;
@@ -20,15 +21,28 @@ const POPULAR_SEARCHES = [
   "Jujutsu Kaisen", "Fullmetal Alchemist", "Naruto", "Frieren",
 ];
 
-export default function WatchPage() {
+function WatchPageInner() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Auto-trigger from mood finder: /watch?q=Attack+on+Titan
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) {
+      setQuery(q);
+      // small delay so the input renders first
+      setTimeout(() => getVerdict(q), 100);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (query.length < 2) { setSuggestions([]); setOpen(false); return; }
@@ -44,6 +58,7 @@ export default function WatchPage() {
       } catch { setSuggestions([]); setOpen(false); }
       setSearchLoading(false);
     }, 380);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   const getVerdict = async (title?: string) => {
@@ -52,6 +67,7 @@ export default function WatchPage() {
     setLoading(true);
     setOpen(false);
     setSuggestions([]);
+    setError(null);
     try {
       const res = await fetch("/api/verdict", {
         method: "POST",
@@ -59,9 +75,20 @@ export default function WatchPage() {
         body: JSON.stringify({ query: q }),
       });
       const data = await res.json();
-      if (data.anime_slug) router.push(`/watch/${data.anime_slug}`);
-    } catch { /* ignore */ }
-    setLoading(false);
+      if (!res.ok) {
+        setError(data.error ?? "Anime not found. Try a different title.");
+        return;
+      }
+      if (data.anime_slug) {
+        router.push(`/watch/${data.anime_slug}`);
+      } else {
+        setError("Couldn't generate a verdict. Try a different title.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,7 +108,7 @@ export default function WatchPage() {
             Should I watch<br /><span className="text-[#16A34A]">this anime?</span>
           </h1>
           <p className="text-[#6B7280] text-base leading-relaxed max-w-md">
-            Search any anime. Get an honest WATCH / SKIP / WAIT verdict with reasons, who it&apos;s for, and a test episode. No spoilers.
+            Search any anime. Get an honest WATCH / SKIP / WAIT verdict with vibe tags, binge score, and similar picks. No spoilers.
           </p>
         </div>
 
@@ -96,7 +123,7 @@ export default function WatchPage() {
                 ref={inputRef}
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => { setQuery(e.target.value); setError(null); }}
                 onKeyDown={(e) => e.key === "Enter" && getVerdict()}
                 onFocus={() => suggestions.length > 0 && setOpen(true)}
                 onBlur={() => setTimeout(() => setOpen(false), 180)}
@@ -119,27 +146,28 @@ export default function WatchPage() {
             </Button>
           </div>
 
-          {/* Autocomplete dropdown with posters */}
+          {/* Error message */}
+          {error && (
+            <div className="mt-2 px-3 py-2 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 animate-scale-in">
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* Autocomplete dropdown */}
           {open && suggestions.length > 0 && (
             <div className="absolute top-14 left-0 right-0 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl z-20 overflow-hidden animate-scale-in">
               {suggestions.map((s, i) => (
                 <button key={s.mal_id}
                   onMouseDown={() => { setQuery(s.title); setOpen(false); getVerdict(s.title); }}
                   className="w-full text-left px-3 py-2.5 hover:bg-[#F3F4F6] flex items-center gap-3 border-b border-[#F9F9F9] last:border-0 transition-colors">
-
-                  {/* Anime poster */}
                   <div className="w-9 h-12 rounded-lg overflow-hidden bg-[#F3F4F6] shrink-0">
                     {s.image_url ? (
                       <Image src={s.image_url} alt={s.title} width={36} height={48}
                         className="w-full h-full object-cover" unoptimized />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[#9CA3AF] text-xs font-bold">
-                        {i + 1}
-                      </div>
+                      <div className="w-full h-full flex items-center justify-center text-[#9CA3AF] text-xs font-bold">{i + 1}</div>
                     )}
                   </div>
-
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#0F0F0F] truncate">{s.title}</p>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -147,8 +175,6 @@ export default function WatchPage() {
                       {s.episodes && <span className="text-[10px] text-[#9CA3AF]">{s.episodes} eps</span>}
                     </div>
                   </div>
-
-                  {/* Score */}
                   {s.score && (
                     <div className="shrink-0 flex items-center gap-1 bg-[#FEF9C3] px-2 py-1 rounded-lg">
                       <span className="text-xs">⭐</span>
@@ -162,7 +188,7 @@ export default function WatchPage() {
         </div>
 
         {/* Quick searches */}
-        {!query && (
+        {!query && !loading && (
           <div className="mb-10 animate-fade-in-up stagger-2">
             <p className="text-xs text-[#9CA3AF] mb-2.5 font-medium">Popular searches</p>
             <div className="flex flex-wrap gap-2">
@@ -176,8 +202,19 @@ export default function WatchPage() {
           </div>
         )}
 
+        {/* Loading state */}
+        {loading && (
+          <div className="flex flex-col items-center gap-3 py-12 animate-fade-in">
+            <svg className="animate-spin w-8 h-8 text-[#16A34A]" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"/>
+              <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/>
+            </svg>
+            <p className="text-sm font-medium text-[#6B7280]">Generating verdict for &ldquo;{query}&rdquo;…</p>
+          </div>
+        )}
+
         {/* Trending verdicts */}
-        <TrendingVerdicts />
+        {!loading && <TrendingVerdicts />}
       </div>
     </div>
   );
@@ -213,7 +250,6 @@ function TrendingVerdicts() {
           return (
             <a key={v.anime_slug} href={`/watch/${v.anime_slug}`}
               className="flex items-center gap-3 p-3 bg-white border border-[#E5E7EB] rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 group">
-              {/* Poster */}
               <div className="w-10 h-14 rounded-lg overflow-hidden bg-[#F3F4F6] shrink-0">
                 {v.image_url ? (
                   <Image src={v.image_url} alt={v.anime_title} width={40} height={56}
@@ -234,5 +270,13 @@ function TrendingVerdicts() {
         })}
       </div>
     </div>
+  );
+}
+
+export default function WatchPage() {
+  return (
+    <Suspense>
+      <WatchPageInner />
+    </Suspense>
   );
 }
