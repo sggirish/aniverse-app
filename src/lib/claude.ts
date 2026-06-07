@@ -385,3 +385,439 @@ Output as JSON:
   if (!json) throw new Error("No JSON in response");
   return JSON.parse(json) as MoodResult;
 }
+
+// ── Compatibility types ───────────────────────────────────────────────────────
+
+export interface CompatibilityResult {
+  score: number; // 0-100
+  label: string; // e.g. "Anime Soulmates"
+  summary: string;
+  shared_favorites: string[];
+  clashing_tastes: string[];
+  watch_together: string[];
+  why_youll_fight: string;
+  fun_fact: string;
+}
+
+export async function generateCompatibility(
+  userA: { username: string; top_genres: string[]; top_rated: string[]; mean_score: number },
+  userB: { username: string; top_genres: string[]; top_rated: string[]; mean_score: number }
+): Promise<CompatibilityResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 700,
+    system: "You are a witty anime compatibility analyst. Be fun, specific, and honest. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Analyze the anime taste compatibility between two people:
+
+${userA.username}: genres=${userA.top_genres.join(", ")}, top anime=${userA.top_rated.join(", ")}, mean score=${userA.mean_score}
+${userB.username}: genres=${userB.top_genres.join(", ")}, top anime=${userB.top_rated.join(", ")}, mean score=${userB.mean_score}
+
+Output as JSON:
+{
+  "score": <0-100 compatibility percentage>,
+  "label": "Creative compatibility label e.g. 'Anime Soulmates', 'Respectful Rivals', 'Chaos Duo', 'Opposites Attract'",
+  "summary": "2 sentences about their overall compatibility",
+  "shared_favorites": ["Up to 3 anime genres or titles both would love"],
+  "clashing_tastes": ["1-2 specific things they'd disagree on"],
+  "watch_together": ["3 anime titles perfect for both of them to watch together"],
+  "why_youll_fight": "One funny sentence about what they'd argue about",
+  "fun_fact": "One surprising insight about their combined taste profile"
+}`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text response");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as CompatibilityResult;
+}
+
+// ── Watch Order types ─────────────────────────────────────────────────────────
+
+export interface WatchOrderResult {
+  franchise: string;
+  total_entries: number;
+  difficulty: "Easy" | "Moderate" | "Complex";
+  order: Array<{ num: number; title: string; type: string; episodes: string; note: string; essential: boolean }>;
+  quick_start: string;
+  skip_ok: string[];
+  summary: string;
+}
+
+export async function generateWatchOrder(franchise: string): Promise<WatchOrderResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 1000,
+    system: "You are a definitive anime watch order guide. Give practical, opinionated guidance. No spoilers. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Give the definitive watch order for the "${franchise}" anime franchise.
+
+Output as JSON:
+{
+  "franchise": "Official franchise name",
+  "total_entries": <number of entries in your order>,
+  "difficulty": "Easy" | "Moderate" | "Complex",
+  "order": [
+    { "num": 1, "title": "Exact title", "type": "TV/Movie/OVA/ONA", "episodes": "e.g. '24 eps' or 'Movie'", "note": "One sentence: why this entry, what it adds", "essential": true/false }
+  ],
+  "quick_start": "If someone wants to start with just ONE entry, which one and why (1 sentence)",
+  "skip_ok": ["Titles that are safe to skip without missing plot"],
+  "summary": "2 sentences on what makes this franchise worth watching"
+}`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as WatchOrderResult;
+}
+
+// ── Should I Continue types ───────────────────────────────────────────────────
+
+export interface ContinueResult {
+  verdict: "KEEP GOING" | "SKIP TO" | "DROP IT";
+  verdict_reason: string;
+  it_gets_better: boolean;
+  gets_better_at: string | null;
+  skip_to_episode: number | null;
+  skip_reason: string | null;
+  honest_warning: string;
+  similar_if_dropping: string[];
+}
+
+export async function generateShouldContinue(title: string, droppedAt: number): Promise<ContinueResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 600,
+    system: "You are a brutally honest anime advisor. No spoilers but don't sugarcoat. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Someone dropped "${title}" at episode ${droppedAt}. Should they continue?
+
+Output as JSON:
+{
+  "verdict": "KEEP GOING" | "SKIP TO" | "DROP IT",
+  "verdict_reason": "1-2 sentences of honest reasoning",
+  "it_gets_better": true/false,
+  "gets_better_at": "Episode or arc description if it gets better, otherwise null",
+  "skip_to_episode": <episode number to skip to, or null>,
+  "skip_reason": "Why skipping to that episode works, or null",
+  "honest_warning": "One honest warning about what they're getting into",
+  "similar_if_dropping": ["2 better alternatives if verdict is DROP IT"]
+}`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as ContinueResult;
+}
+
+// ── Debate types ──────────────────────────────────────────────────────────────
+
+export interface DebateResult {
+  opinion: string;
+  verdict: "BASED" | "WRONG" | "COMPLICATED";
+  verdict_reason: string;
+  for_side: string[];
+  against_side: string[];
+  final_take: string;
+  spicy_score: number; // 1-10
+}
+
+export async function generateDebate(opinion: string): Promise<DebateResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 700,
+    system: "You are a confident anime debate judge. You argue both sides fairly but commit to a verdict. Be entertaining and specific. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Debate this anime opinion: "${opinion}"
+
+Output as JSON:
+{
+  "opinion": "${opinion}",
+  "verdict": "BASED" | "WRONG" | "COMPLICATED",
+  "verdict_reason": "2 sentences of your final verdict with confidence",
+  "for_side": ["3 strong arguments FOR this opinion"],
+  "against_side": ["3 strong arguments AGAINST this opinion"],
+  "final_take": "One definitive, opinionated closing statement",
+  "spicy_score": <1-10, how controversial this opinion is>
+}`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as DebateResult;
+}
+
+// ── Identity Card types ───────────────────────────────────────────────────────
+
+export interface IdentityCardResult {
+  title: string;
+  tagline: string;
+  watcher_class: string;
+  episodes_badge: string;
+  peak_anime: string;
+  hidden_depth: string;
+  taste_words: string[];
+  era: string;
+  loyalty_score: number; // 1-10
+  rare_trait: string;
+}
+
+export async function generateIdentityCard(malSummary: {
+  username: string;
+  mean_score: number;
+  completed: number;
+  episodes_watched: number;
+  top_genres: string[];
+  top_rated: string[];
+  most_watched_franchise: string;
+}): Promise<IdentityCardResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 700,
+    system: "You create beautiful, positive anime identity cards. Celebrate the watcher. Be specific and flattering — like a compliment wrapped in data. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Create an anime identity card for this watcher:
+
+Username: ${malSummary.username}
+Mean score: ${malSummary.mean_score}
+Completed: ${malSummary.completed} anime
+Episodes: ${malSummary.episodes_watched}
+Top genres: ${malSummary.top_genres.join(", ")}
+Highest rated: ${malSummary.top_rated.join(", ")}
+Most watched franchise: ${malSummary.most_watched_franchise}
+
+Output as JSON:
+{
+  "title": "Their watcher identity title e.g. 'The Emotional Architect' or 'The Quiet Completionist' or 'The Genre Nomad'",
+  "tagline": "One evocative sentence that perfectly describes their anime soul",
+  "watcher_class": "RPG-style class name e.g. 'Veteran Analyst', 'Emotional Glutton', 'Hidden Gem Ranger'",
+  "episodes_badge": "Creative badge for their episode count e.g. '4,200 Episodes Deep', 'Basically a Full-Time Job'",
+  "peak_anime": "The anime that probably defines them most, from their top rated",
+  "hidden_depth": "One surprising positive insight about their taste",
+  "taste_words": ["5 one-word descriptors of their taste e.g. 'Intense', 'Eclectic', 'Nostalgic'"],
+  "era": "Their anime era e.g. 'Golden Age Veteran', 'Modern Wave Rider', 'Cross-Era Explorer'",
+  "loyalty_score": <1-10, how loyal/dedicated a watcher they are>,
+  "rare_trait": "One rare positive trait that makes them unique e.g. '97% completion rate puts you in the top 3% of watchers'"
+}`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as IdentityCardResult;
+}
+
+// ── Seasonal Watchlist types ──────────────────────────────────────────────────
+
+export interface SeasonalAnime {
+  rank: number;
+  title: string;
+  verdict: "WATCH" | "SKIP" | "WAIT";
+  hook: string;
+  genres: string[];
+  episodes: string;
+  why_this_season: string;
+  for_fans_of: string;
+}
+
+export interface SeasonalResult {
+  season: string;
+  year: number;
+  generated_at: string;
+  intro: string;
+  picks: SeasonalAnime[];
+}
+
+export async function generateSeasonalWatchlist(season: string, year: number, animeList: string[]): Promise<SeasonalResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 2000,
+    system: "You are a seasonal anime guide. Give honest, useful verdicts for new watchers. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Generate verdicts for the ${season} ${year} anime season. Here are the airing shows: ${animeList.join(", ")}
+
+Output as JSON:
+{
+  "season": "${season}",
+  "year": ${year},
+  "generated_at": "${new Date().toISOString()}",
+  "intro": "2 sentences on what makes this season special or weak",
+  "picks": [
+    {
+      "rank": 1,
+      "title": "Exact title",
+      "verdict": "WATCH" | "SKIP" | "WAIT",
+      "hook": "3-5 evocative words",
+      "genres": ["genre1", "genre2"],
+      "episodes": "e.g. '12 eps' or 'Ongoing'",
+      "why_this_season": "One sentence on why it stands out this season",
+      "for_fans_of": "One sentence on who this is for"
+    }
+  ]
+}
+
+Include all shows, ranked by recommendation strength.`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as SeasonalResult;
+}
+
+// ── Tier List types ───────────────────────────────────────────────────────────
+
+export interface TierEntry {
+  title: string;
+  tier: "S" | "A" | "B" | "C" | "D" | "F";
+  reason: string;
+}
+
+export interface TierListResult {
+  category: string;
+  intro: string;
+  tiers: TierEntry[];
+  hot_take: string;
+  most_controversial: string;
+}
+
+export async function generateTierList(category: string): Promise<TierListResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 1200,
+    system: "You are an opinionated anime tier list maker. Be bold, specific, and willing to be controversial. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Create an opinionated tier list for: "${category}"
+
+Pick 12-16 relevant anime/characters/openings and assign them S/A/B/C/D/F tiers.
+
+Output as JSON:
+{
+  "category": "${category}",
+  "intro": "One punchy sentence about this tier list",
+  "tiers": [
+    { "title": "Name", "tier": "S"|"A"|"B"|"C"|"D"|"F", "reason": "One sentence justification" }
+  ],
+  "hot_take": "The most controversial placement and why you stand by it",
+  "most_controversial": "The title most people will disagree with your ranking of"
+}`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as TierListResult;
+}
+
+// ── Verse of the Day ──────────────────────────────────────────────────────────
+
+export interface VerseOfDay {
+  quote: string;
+  character: string;
+  anime: string;
+  reflection: string;
+}
+
+export async function generateVerseOfDay(): Promise<VerseOfDay> {
+  const today = new Date().toISOString().slice(0, 10);
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 300,
+    system: "You pick memorable, meaningful anime quotes. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Pick one iconic anime quote for today (${today}). Choose something that's genuinely meaningful or thought-provoking, not just famous.
+
+Output as JSON:
+{ "quote": "exact quote", "character": "character name", "anime": "anime title", "reflection": "One sentence on why this quote matters" }`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as VerseOfDay;
+}
+
+// ── Year in Anime Wrapped ─────────────────────────────────────────────────────
+
+export interface WrappedResult {
+  year: number;
+  username: string;
+  headline: string;
+  total_episodes: number;
+  total_anime: number;
+  top_genre: string;
+  peak_anime: string;
+  personality_evolution: string;
+  defining_moment: string;
+  stats_story: string;
+  next_year_prediction: string;
+  wrapped_title: string;
+}
+
+export async function generateWrapped(year: number, malSummary: {
+  username: string;
+  completed: number;
+  episodes_watched: number;
+  top_genres: string[];
+  top_rated: string[];
+  mean_score: number;
+  most_watched_franchise: string;
+}): Promise<WrappedResult> {
+  const msg = await client.messages.create({
+    model: "claude-sonnet-4-6",
+    max_tokens: 800,
+    system: "You create beautiful Year in Anime summaries like Spotify Wrapped. Celebratory, personal, shareable. Respond with JSON only.",
+    messages: [{
+      role: "user",
+      content: `Create a ${year} Year in Anime Wrapped for:
+
+Username: ${malSummary.username}
+Completed: ${malSummary.completed} anime
+Episodes: ${malSummary.episodes_watched}
+Top genres: ${malSummary.top_genres.join(", ")}
+Top rated: ${malSummary.top_rated.join(", ")}
+Mean score: ${malSummary.mean_score}
+Most watched franchise: ${malSummary.most_watched_franchise}
+
+Output as JSON:
+{
+  "year": ${year},
+  "username": "${malSummary.username}",
+  "headline": "Bold one-liner headline for their year e.g. 'The Year You Finally Got Into Seinen'",
+  "total_episodes": ${malSummary.episodes_watched},
+  "total_anime": ${malSummary.completed},
+  "top_genre": "${malSummary.top_genres[0]}",
+  "peak_anime": "Their defining anime of the year from top rated",
+  "personality_evolution": "One sentence on how their taste evolved",
+  "defining_moment": "A fictional but plausible defining moment e.g. 'The episode that made you cry at 2am'",
+  "stats_story": "2 sentences telling the story of their year in anime",
+  "next_year_prediction": "Playful prediction for next year's anime journey",
+  "wrapped_title": "A creative title card for their year e.g. 'The Emotional Renaissance of ${malSummary.username}'"
+}`,
+    }],
+  });
+  const content = msg.content[0];
+  if (content.type !== "text") throw new Error("No text");
+  const json = content.text.match(/\{[\s\S]*\}/)?.[0];
+  if (!json) throw new Error("No JSON");
+  return JSON.parse(json) as WrappedResult;
+}

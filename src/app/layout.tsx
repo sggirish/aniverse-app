@@ -64,11 +64,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <nav className="flex items-center gap-1">
               {[
-                { href: "/roast",     label: "🔥 Roast",     color: "hover:text-[#DC2626]" },
-                { href: "/watch",     label: "▶ Verdict",    color: "hover:text-[#16A34A]" },
-                { href: "/character", label: "◉ Character",  color: "hover:text-[#2563EB]" },
-                { href: "/mood",      label: "🎭 Mood",       color: "hover:text-[#7C3AED]" },
-                { href: "/games",     label: "🎮 Games",      color: "hover:text-[#8B5CF6]" },
+                { href: "/roast",         label: "🔥 Roast",     color: "hover:text-[#DC2626]" },
+                { href: "/watch",         label: "▶ Verdict",    color: "hover:text-[#16A34A]" },
+                { href: "/character",     label: "◉ Character",  color: "hover:text-[#2563EB]" },
+                { href: "/mood",          label: "🎭 Mood",       color: "hover:text-[#7C3AED]" },
+                { href: "/games",         label: "🎮 Games",      color: "hover:text-[#8B5CF6]" },
+                { href: "/season",        label: "📅 Season",     color: "hover:text-[#3B82F6]" },
+                { href: "/news",          label: "📰 News",       color: "hover:text-[#10B981]" },
               ].map((n) => (
                 <Link key={n.href} href={n.href}
                   className={`text-sm font-medium px-3 py-1.5 rounded-lg text-[#6B7280] ${n.color} hover:bg-[#F3F4F6] transition-all`}>
@@ -117,9 +119,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Logo />
               <span>AniVerse · Built by Bhairav · 2026</span>
             </div>
-            <div className="flex gap-4">
-              <Link href="/privacy" className="hover:text-[#6B7280]">Privacy</Link>
-              <Link href="/terms"   className="hover:text-[#6B7280]">Terms</Link>
+            <div className="flex gap-4 flex-wrap">
+              <Link href="/games"    className="hover:text-[#6B7280]">Games</Link>
+              <Link href="/news"     className="hover:text-[#6B7280]">News</Link>
+              <Link href="/wrapped"  className="hover:text-[#6B7280]">Wrapped</Link>
+              <Link href="/pro"      className="hover:text-[#6B7280]">Pro</Link>
+              <Link href="/api-docs" className="hover:text-[#6B7280]">API</Link>
+              <Link href="/privacy"  className="hover:text-[#6B7280]">Privacy</Link>
+              <Link href="/terms"    className="hover:text-[#6B7280]">Terms</Link>
               <a href="https://buymeacoffee.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#6B7280]">Support AniVerse ☕</a>
             </div>
           </div>

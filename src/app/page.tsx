@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTrendingVerdicts } from "@/lib/db";
+import { VerseOfDay } from "@/components/VerseOfDay";
 
 export default async function HomePage() {
   let trending: Awaited<ReturnType<typeof getTrendingVerdicts>> = [];
@@ -92,6 +93,34 @@ export default async function HomePage() {
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#7C3AED] text-white rounded-xl text-center hover:bg-[#6D28D9] transition-colors group-hover:shadow-md">
               Find tonight&apos;s anime →
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Verse of the Day ─────────────────────────────────────────────── */}
+      <VerseOfDay />
+
+      {/* ── More Tools section ───────────────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-4">
+        <div className="mb-3">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#9CA3AF] mb-3">More AI Tools</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { href: "/compatibility", emoji: "💘", name: "Taste Compatibility", color: "text-pink-500 bg-pink-50 border-pink-200" },
+              { href: "/watchorder",    emoji: "📺", name: "Watch Order Guide",   color: "text-amber-600 bg-amber-50 border-amber-200" },
+              { href: "/continue",      emoji: "🤔", name: "Should I Continue?",  color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+              { href: "/debate",        emoji: "🔥", name: "Debate Engine",       color: "text-red-500 bg-red-50 border-red-200" },
+              { href: "/identity",      emoji: "🎭", name: "Identity Card",       color: "text-purple-600 bg-purple-50 border-purple-200" },
+              { href: "/season",        emoji: "📅", name: "Seasonal Watchlist",  color: "text-blue-600 bg-blue-50 border-blue-200" },
+              { href: "/tier",          emoji: "📊", name: "Tier List Generator", color: "text-yellow-600 bg-yellow-50 border-yellow-200" },
+              { href: "/wrapped",       emoji: "🎁", name: "Year in Anime",       color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
+            ].map((t) => (
+              <Link key={t.href} href={t.href}
+                className={`flex items-center gap-2.5 p-3 rounded-xl border ${t.color} hover:shadow-md hover:-translate-y-0.5 transition-all`}>
+                <span className="text-xl">{t.emoji}</span>
+                <span className="text-xs font-semibold leading-tight">{t.name}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
