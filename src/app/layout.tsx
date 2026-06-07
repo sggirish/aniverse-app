@@ -8,6 +8,7 @@ import { CookieBanner } from "@/components/CookieBanner";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
@@ -44,6 +45,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             data-domain={plausibleDomain}
             src="https://plausible.io/js/script.tagged-events.js"
           />
+        )}
+        {gaMeasurementId && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaMeasurementId}');`,
+              }}
+            />
+          </>
         )}
         {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && (
           <script
