@@ -68,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 { href: "/watch",     label: "▶ Verdict",    color: "hover:text-[#16A34A]" },
                 { href: "/character", label: "◉ Character",  color: "hover:text-[#2563EB]" },
                 { href: "/mood",      label: "🎭 Mood",       color: "hover:text-[#7C3AED]" },
+                { href: "/games",     label: "🎮 Games",      color: "hover:text-[#8B5CF6]" },
               ].map((n) => (
                 <Link key={n.href} href={n.href}
                   className={`text-sm font-medium px-3 py-1.5 rounded-lg text-[#6B7280] ${n.color} hover:bg-[#F3F4F6] transition-all`}>
@@ -92,12 +93,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Mobile bottom tab bar */}
         <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-[#E5E7EB] z-20">
-          <div className="grid grid-cols-4 h-16">
+          <div className="grid grid-cols-5 h-16">
             {[
               { href: "/roast",     icon: "🔥", label: "Roast",     active: "#DC2626" },
               { href: "/watch",     icon: "▶",  label: "Verdict",   active: "#16A34A" },
-              { href: "/character", icon: "◉",  label: "Character", active: "#2563EB" },
+              { href: "/character", icon: "◉",  label: "Char",      active: "#2563EB" },
               { href: "/mood",      icon: "🎭", label: "Mood",      active: "#7C3AED" },
+              { href: "/games",     icon: "🎮", label: "Games",     active: "#8B5CF6" },
             ].map((t) => (
               <Link key={t.href} href={t.href}
                 className="flex flex-col items-center justify-center gap-0.5 text-[#6B7280] hover:text-[#0F0F0F] transition-colors">

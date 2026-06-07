@@ -91,3 +91,36 @@ CREATE POLICY "roast_cache_service_only"
 CREATE POLICY "character_matches_service_only"
   ON character_matches FOR ALL
   USING (auth.role() = 'service_role');
+
+-- ── Game Scores ───────────────────────────────────────────────────────────────
+-- Run this migration for the games feature
+
+CREATE TABLE IF NOT EXISTS game_scores (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  game         text NOT NULL CHECK (game IN ('duel', 'cipher', 'guesser')),
+  session_id   text NOT NULL,
+  score        int NOT NULL DEFAULT 0,
+  accuracy     int,         -- 0-100
+  time_seconds int,
+  metadata     jsonb,
+  created_at   timestamptz DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_game_scores_game_score ON game_scores(game, score DESC);
+CREATE INDEX IF NOT EXISTS idx_game_scores_created    ON game_scores(created_at DESC);
+
+ALTER TABLE game_scores ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "game_scores_public_read"
+  ON game_scores FOR SELECT
+  USING (true);
+
+CREATE POLICY "game_scores_service_write"
+  ON game_scores FOR INSERT
+  WITH CHECK (true);
+
+-- Column migrations for existing tables (safe to re-run)
+ALTER TABLE verdicts ADD COLUMN IF NOT EXISTS metadata jsonb;
+ALTER TABLE character_matches ADD COLUMN IF NOT EXISTS secondary_character text;
+ALTER TABLE character_matches ADD COLUMN IF NOT EXISTS secondary_anime text;
+ALTER TABLE character_matches ADD COLUMN IF NOT EXISTS archetype text;

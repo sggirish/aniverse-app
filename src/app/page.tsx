@@ -24,7 +24,7 @@ export default async function HomePage() {
         </h1>
 
         <p className="text-[#6B7280] text-lg max-w-xl mb-12 leading-relaxed animate-fade-in-up stagger-2">
-          Four free AI tools that understand anime better than your friends. No login, no BS — just instant results.
+          Free AI tools + competitive games that understand anime better than your friends. No login, no BS.
         </p>
 
         {/* Tool cards */}
@@ -92,6 +92,36 @@ export default async function HomePage() {
               className="mt-auto text-sm font-bold px-4 py-3 bg-[#7C3AED] text-white rounded-xl text-center hover:bg-[#6D28D9] transition-colors group-hover:shadow-md">
               Find tonight&apos;s anime →
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Games section ────────────────────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-4">
+        <div className="bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] border-2 border-purple-200 rounded-2xl p-6 animate-fade-in-up">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🎮</span>
+              <div>
+                <p className="font-black text-lg text-[#8B5CF6]">AniVerse Games</p>
+                <p className="text-xs text-[#9CA3AF]">Compete on leaderboards · Challenge friends</p>
+              </div>
+            </div>
+            <Link href="/games" className="text-xs font-bold text-[#8B5CF6] hover:underline">View all →</Link>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { href: "/duel",    emoji: "⚔️", name: "Duelist",  desc: "Speed picks" },
+              { href: "/cipher",  emoji: "🔐", name: "Cipher",   desc: "Decode synopses" },
+              { href: "/guesser", emoji: "🎯", name: "Guesser",  desc: "Predict verdict" },
+            ].map((g) => (
+              <Link key={g.href} href={g.href}
+                className="flex flex-col items-center gap-1.5 p-4 bg-white/70 rounded-xl hover:bg-white hover:shadow-md transition-all text-center">
+                <span className="text-2xl">{g.emoji}</span>
+                <p className="text-xs font-black text-[#374151]">{g.name}</p>
+                <p className="text-[10px] text-[#9CA3AF]">{g.desc}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
