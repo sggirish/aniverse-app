@@ -9,14 +9,15 @@ export function BuyMeCoffee() {
     if (used) setShow(true);
   }, []);
 
-  if (!show) return null;
+  const url = process.env.NEXT_PUBLIC_RAZORPAY_URL ?? process.env.NEXT_PUBLIC_BMC_URL;
+  if (!show || !url) return null;
 
   return (
     <a
-      href={process.env.NEXT_PUBLIC_BMC_URL ?? "https://buymeacoffee.com"}
+      href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-30 flex items-center gap-2 bg-[#FFDD00] text-[#0F0F0F] font-semibold text-sm px-4 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+      className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-30 flex items-center gap-2 bg-[#072654] text-white font-semibold text-sm px-4 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
     >
       ☕ Support AniDeck
     </a>
